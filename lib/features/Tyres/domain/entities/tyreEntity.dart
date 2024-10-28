@@ -1,0 +1,20 @@
+import 'package:tyres_frontend/features/Tyres/domain/entities/tyrePositionEntity.dart';
+
+class TyreEntity {
+  final int? id;
+  final int? truckId;
+  final int? startMileage;
+  final int? endMileage;
+  final String? serial;
+  final String? model;
+  final TyrePositionEntity? position;
+
+  TyreEntity(
+      {required this.id,
+      required this.truckId,
+      required this.startMileage,
+      required this.endMileage,
+      required this.serial,
+      required this.model,
+      required this.position});
+}

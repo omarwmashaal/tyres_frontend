@@ -5,7 +5,7 @@ import 'package:tyres_frontend/features/Authentication/data/models/loginModel.da
 import 'package:tyres_frontend/features/Authentication/data/models/registerModel.dart';
 import 'package:tyres_frontend/features/Authentication/domain/repo/authenticationRepo.dart';
 
-class RegisterUseCase extends UseCases<NoParams, Registermodel> {
+class RegisterUseCase extends UseCase<NoParams, Registermodel> {
   final Authenticationrepo authenticationrepo;
 
   RegisterUseCase({required this.authenticationrepo});

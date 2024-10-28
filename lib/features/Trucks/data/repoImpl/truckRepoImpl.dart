@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:tyres_frontend/core/failure.dart';
 import 'package:tyres_frontend/core/usecase/usecases.dart';
 import 'package:tyres_frontend/features/Trucks/data/datasource/truckDatasource.dart';
+import 'package:tyres_frontend/features/Trucks/data/models/truckModel.dart';
 import 'package:tyres_frontend/features/Trucks/domain/entities/truckEntity.dart';
 import 'package:tyres_frontend/features/Trucks/domain/repo/truckRepo.dart';
 
@@ -10,18 +11,21 @@ class Truckrepoimpl implements Truckrepo {
 
   Truckrepoimpl({required this.truckdatasource});
   @override
-  Future<Either<Failure, Truckentity>> addTrcuk(Truckentity truck) async {
+  Future<Either<Failure, TruckEntity>> addTrcuk(TruckEntity truck) async {
     try {
-      return Right(await truckdatasource.addTrcuk(truck));
+      var truckModel = TruckModel.fromEntity(truck);
+      var result = await truckdatasource.addTrcuk(truckModel);
+      return Right(result.toEntity());
     } on Exception {
       return Left(Failure_HttpBadRequest(message: ""));
     }
   }
 
   @override
-  Future<Either<Failure, Truckentity>> getTruckData(int id) async {
+  Future<Either<Failure, TruckEntity>> getTruckData(int id) async {
     try {
-      return Right(await truckdatasource.getTruckData(id));
+      var result = await truckdatasource.getTruckData(id);
+      return Right(result.toEntity());
     } on Exception {
       return Left(Failure_HttpBadRequest(message: ""));
     }
@@ -37,18 +41,21 @@ class Truckrepoimpl implements Truckrepo {
   }
 
   @override
-  Future<Either<Failure, List<Truckentity>>> searchTrucks(String search) async {
+  Future<Either<Failure, List<TruckEntity>>> searchTrucks(String search) async {
     try {
-      return Right(await truckdatasource.searchTrucks(search));
+      var result = await truckdatasource.searchTrucks(search);
+      return Right(result.map((x) => x.toEntity()).toList());
     } on Exception {
       return Left(Failure_HttpBadRequest(message: ""));
     }
   }
 
   @override
-  Future<Either<Failure, Truckentity>> udpateTruckData(Truckentity data) async {
+  Future<Either<Failure, TruckEntity>> udpateTruckData(TruckEntity data) async {
     try {
-      return Right(await truckdatasource.udpateTruckData(data));
+      var truckModel = TruckModel.fromEntity(data);
+      var result = await truckdatasource.udpateTruckData(truckModel);
+      return Right(result.toEntity());
     } on Exception {
       return Left(Failure_HttpBadRequest(message: ""));
     }

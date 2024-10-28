@@ -4,7 +4,7 @@ import 'package:tyres_frontend/core/usecase/usecases.dart';
 import 'package:tyres_frontend/features/Authentication/data/models/loginModel.dart';
 import 'package:tyres_frontend/features/Authentication/domain/repo/authenticationRepo.dart';
 
-class LoginUseCase extends UseCases<String, Loginmodel> {
+class LoginUseCase extends UseCase<String, Loginmodel> {
   final Authenticationrepo authenticationrepo;
 
   LoginUseCase({required this.authenticationrepo});

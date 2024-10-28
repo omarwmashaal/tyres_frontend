@@ -7,7 +7,7 @@ import 'package:tyres_frontend/features/Authentication/domain/repo/authenticatio
 import 'package:tyres_frontend/features/Trucks/domain/entities/truckEntity.dart';
 import 'package:tyres_frontend/features/Trucks/domain/repo/truckRepo.dart';
 
-class RemoveTruckUseCase extends UseCases<NoParams, int> {
+class RemoveTruckUseCase extends UseCase<NoParams, int> {
   final Truckrepo truckrepo;
 
   RemoveTruckUseCase({required this.truckrepo});

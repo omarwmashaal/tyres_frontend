@@ -7,12 +7,12 @@ import 'package:tyres_frontend/features/Authentication/domain/repo/authenticatio
 import 'package:tyres_frontend/features/Trucks/domain/entities/truckEntity.dart';
 import 'package:tyres_frontend/features/Trucks/domain/repo/truckRepo.dart';
 
-class UpdateTruckUseCase extends UseCases<Truckentity, Truckentity> {
+class UpdateTruckUseCase extends UseCase<TruckEntity, TruckEntity> {
   final Truckrepo truckrepo;
 
   UpdateTruckUseCase({required this.truckrepo});
   @override
-  Future<Either<Failure, Truckentity>> call(Truckentity params) async {
+  Future<Either<Failure, TruckEntity>> call(TruckEntity params) async {
     return await truckrepo.udpateTruckData(params).then((value) {
       return value.fold(
         (l) => Left(l..message = "Update Truck: ${l.message}"),

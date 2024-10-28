@@ -1,13 +1,13 @@
 import 'package:tyres_frontend/core/httpRepo.dart';
 import 'package:tyres_frontend/core/usecase/usecases.dart';
-import 'package:tyres_frontend/features/Trucks/domain/entities/truckEntity.dart';
+import 'package:tyres_frontend/features/Trucks/data/models/truckModel.dart';
 
 abstract class Truckdatasource {
-  Future<List<Truckentity>> searchTrucks(String search);
-  Future<Truckentity> addTrcuk(Truckentity truck);
+  Future<List<TruckModel>> searchTrucks(String search);
+  Future<TruckModel> addTrcuk(TruckModel truck);
   Future<NoParams> removeTruck(int id);
-  Future<Truckentity> udpateTruckData(Truckentity data);
-  Future<Truckentity> getTruckData(int id);
+  Future<TruckModel> udpateTruckData(TruckModel data);
+  Future<TruckModel> getTruckData(int id);
 }
 
 class TruckDatasourceImpl implements Truckdatasource {
@@ -15,13 +15,13 @@ class TruckDatasourceImpl implements Truckdatasource {
 
   TruckDatasourceImpl({required this.httpRepo});
   @override
-  Future<Truckentity> addTrcuk(Truckentity truck) async {
-    return Truckentity(id: 1, platNo: "platNo", currentMileage: 22);
+  Future<TruckModel> addTrcuk(TruckModel truck) async {
+    return TruckModel(id: 1, platNo: "platNo", currentMileage: 22);
   }
 
   @override
-  Future<Truckentity> getTruckData(int id) async {
-    return Truckentity(id: 1, platNo: "platNo", currentMileage: 22);
+  Future<TruckModel> getTruckData(int id) async {
+    return TruckModel(id: 1, platNo: "platNo", currentMileage: 22);
   }
 
   @override
@@ -30,12 +30,12 @@ class TruckDatasourceImpl implements Truckdatasource {
   }
 
   @override
-  Future<List<Truckentity>> searchTrucks(String search) async {
-    return [Truckentity(id: 1, platNo: "platNo", currentMileage: 22)];
+  Future<List<TruckModel>> searchTrucks(String search) async {
+    return [TruckModel(id: 1, platNo: "platNo", currentMileage: 22)];
   }
 
   @override
-  Future<Truckentity> udpateTruckData(Truckentity data) async {
-    return Truckentity(id: 1, platNo: "platNo", currentMileage: 22);
+  Future<TruckModel> udpateTruckData(TruckModel data) async {
+    return TruckModel(id: 1, platNo: "platNo", currentMileage: 22);
   }
 }

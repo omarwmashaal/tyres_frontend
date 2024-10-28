@@ -32,6 +32,10 @@ class FailureFactory {
   }
 }
 
+class ServerFailure extends Failure {
+  ServerFailure({required super.message}) : super(code: 400);
+}
+
 class Failure_HttpBadRequest extends Failure {
   Failure_HttpBadRequest({required super.message}) : super(code: 400);
 }

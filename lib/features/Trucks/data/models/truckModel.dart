@@ -1,75 +1,84 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:tyres_frontend/features/Trucks/domain/entities/truckEntity.dart';
 
 class TruckModel {
   final int? id;
   final String? platNo;
   final int? currentMileage;
-  final List<TyresEntity>? tyres;
+  final List<int>? tyreIds;
 
   TruckModel({
-    this.id,
-    this.platNo,
-    this.currentMileage,
-    this.tyres,
+    required this.id,
+    required this.platNo,
+    required this.currentMileage,
+    this.tyreIds,
   });
 
-  TruckModel copyWith({
-    ValueGetter<int?>? id,
-    ValueGetter<String?>? platNo,
-    ValueGetter<int?>? currentMileage,
-    ValueGetter<List<TyresEntity>?>? tyres,
-  }) {
+  // Factory constructor to create a TruckModel from JSON
+  factory TruckModel.fromJson(Map<String, dynamic> json) {
     return TruckModel(
-      id: id != null ? id() : this.id,
-      platNo: platNo != null ? platNo() : this.platNo,
-      currentMileage: currentMileage != null ? currentMileage() : this.currentMileage,
-      tyres: tyres != null ? tyres() : this.tyres,
+      id: json['id'],
+      platNo: json['platNo'],
+      currentMileage: json['currentMileage'],
+      tyreIds: json['tyreIds'] != null ? List<int>.from(json['tyreIds']) : null,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  // Method to convert TruckModel to a JSON map
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'platNo': platNo,
       'currentMileage': currentMileage,
-      'tyres': tyres?.map((x) => x?.toMap())?.toList(),
+      'tyreIds': tyreIds != null ? List<dynamic>.from(tyreIds!) : null,
     };
   }
 
-  factory TruckModel.fromMap(Map<String, dynamic> map) {
-    return TruckModel(
-      id: map['id']?.toInt(),
-      platNo: map['platNo'],
-      currentMileage: map['currentMileage']?.toInt(),
-      tyres: map['tyres'] != null ? List<TyresEntity>.from(map['tyres']?.map((x) => TyresEntity.fromMap(x))) : null,
+  // Convert Model to Entity
+  TruckEntity toEntity() {
+    return TruckEntity(
+      id: id,
+      platNo: platNo,
+      currentMileage: currentMileage,
+      tyreIds: tyreIds,
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory TruckModel.fromJson(String source) => TruckModel.fromMap(json.decode(source));
-
-  @override
-  String toString() {
-    return 'Truckentity(id: $id, platNo: $platNo, currentMileage: $currentMileage, tyres: $tyres)';
+  // Factory constructor to create a TruckModel from an Entity
+  factory TruckModel.fromEntity(TruckEntity entity) {
+    return TruckModel(
+      id: entity.id,
+      platNo: entity.platNo,
+      currentMileage: entity.currentMileage,
+      tyreIds: entity.tyreIds,
+    );
   }
 
+  // copyWith method for immutability and updating fields
+  TruckModel copyWith({
+    int? id,
+    String? platNo,
+    int? currentMileage,
+    List<int>? tyreIds,
+  }) {
+    return TruckModel(
+      id: id ?? this.id,
+      platNo: platNo ?? this.platNo,
+      currentMileage: currentMileage ?? this.currentMileage,
+      tyreIds: tyreIds ?? this.tyreIds,
+    );
+  }
+
+  // Override equality operator to compare object values
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TruckModel &&
-        other.id == id &&
-        other.platNo == platNo &&
-        other.currentMileage == currentMileage &&
-        listEquals(other.tyres, tyres);
+    return other is TruckModel && other.id == id && other.platNo == platNo && other.currentMileage == currentMileage && other.tyreIds == tyreIds;
   }
 
+  // Override hashCode to ensure consistent hash value
   @override
   int get hashCode {
-    return id.hashCode ^ platNo.hashCode ^ currentMileage.hashCode ^ tyres.hashCode;
+    return id.hashCode ^ platNo.hashCode ^ currentMileage.hashCode ^ tyreIds.hashCode;
   }
 }
