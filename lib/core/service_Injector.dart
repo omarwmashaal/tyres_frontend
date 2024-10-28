@@ -5,6 +5,14 @@ import 'package:tyres_frontend/features/Authentication/data/repoImpl/authenticat
 import 'package:tyres_frontend/features/Authentication/domain/repo/authenticationRepo.dart';
 import 'package:tyres_frontend/features/Authentication/domain/usecases/usaeCase_login.dart';
 import 'package:tyres_frontend/features/Authentication/domain/usecases/usaeCase_register.dart';
+import 'package:tyres_frontend/features/Trucks/data/datasource/truckDatasource.dart';
+import 'package:tyres_frontend/features/Trucks/data/repoImpl/truckRepoImpl.dart';
+import 'package:tyres_frontend/features/Trucks/domain/repo/truckRepo.dart';
+import 'package:tyres_frontend/features/Trucks/domain/usecases/usaeCase_addTruck.dart';
+import 'package:tyres_frontend/features/Trucks/domain/usecases/usaeCase_getTruck.dart';
+import 'package:tyres_frontend/features/Trucks/domain/usecases/usaeCase_removeTruck.dart';
+import 'package:tyres_frontend/features/Trucks/domain/usecases/usaeCase_searchTrucks.dart';
+import 'package:tyres_frontend/features/Trucks/domain/usecases/usaeCase_updateTruck.dart';
 
 var si = GetIt.instance;
 
@@ -20,4 +28,16 @@ setUpServiceInjectors() {
   //usecases
   si.registerLazySingleton(() => LoginUseCase(authenticationrepo: si()));
   si.registerLazySingleton(() => RegisterUseCase(authenticationrepo: si()));
+
+  //?Trucks
+  //datsources
+  si.registerLazySingleton<Truckdatasource>(() => TruckDatasourceImpl(httpRepo: si()));
+  //repo
+  si.registerLazySingleton<Truckrepo>(() => Truckrepoimpl(truckdatasource: si()));
+  //usecases
+  si.registerLazySingleton(() => RemoveTruckUseCase(truckrepo: si()));
+  si.registerLazySingleton(() => SearchTrucksUseCase(truckrepo: si()));
+  si.registerLazySingleton(() => AddTruckUseCase(truckrepo: si()));
+  si.registerLazySingleton(() => UpdateTruckUseCase(truckrepo: si()));
+  si.registerLazySingleton(() => GetTruckUseCase(truckrepo: si()));
 }
