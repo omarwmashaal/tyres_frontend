@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as dio;
+import 'package:tyres_frontend/core/remoteConstats.dart';
 
 class StandardHttpResponse {
   final Object? body;
@@ -74,8 +75,6 @@ abstract class HttpRepo {
 
   Future<StandardHttpResponse> put({required String host, dynamic? body});
   Future<StandardHttpResponse> delete({required String host, dynamic? body});
-
-  Future<StandardHttpResponse> uploadImage({required String url, required Uint8List imageBytes});
 }
 
 class HttpClientImpl implements HttpRepo {
@@ -85,7 +84,7 @@ class HttpClientImpl implements HttpRepo {
     try {
       result = await http.get(Uri.parse(host), headers: headers());
       print(result.statusCode);
-      if (result.statusCode == 401) sl<RoutingBloc>().add(RoutingBlocEvent_UnAuthorized());
+
       return StandardHttpResponse.fromHttpResponse(result);
     } on Exception {
       return StandardHttpResponse(statusCode: result!.statusCode, errorMessage: result.reasonPhrase);
@@ -97,7 +96,7 @@ class HttpClientImpl implements HttpRepo {
     late http.Response result;
     try {
       result = await http.post(Uri.parse(host), headers: headers(), body: json.encode(body));
-      if (result.statusCode == 401) sl<RoutingBloc>().add(RoutingBlocEvent_UnAuthorized());
+
       return StandardHttpResponse.fromHttpResponse(result);
     } catch (e) {
       return StandardHttpResponse(statusCode: result!.statusCode, errorMessage: result.reasonPhrase);
@@ -111,28 +110,10 @@ class HttpClientImpl implements HttpRepo {
     try {
       result = await http.put(Uri.parse(host), headers: headers(), body: json.encode(body));
       print(result);
-      if (result.statusCode == 401) sl<RoutingBloc>().add(RoutingBlocEvent_UnAuthorized());
+
       return StandardHttpResponse.fromHttpResponse(result);
     } catch (e) {
       return StandardHttpResponse(statusCode: result!.statusCode, errorMessage: result.reasonPhrase);
-    }
-  }
-
-  @override
-  Future<StandardHttpResponse> uploadImage({required String url, required Uint8List imageBytes}) async {
-    try {
-      var formData = dio.FormData.fromMap({'FileUpload': await dio.MultipartFile.fromBytes(imageBytes, filename: 'image')});
-      var _dio = dio.Dio();
-      var response = await _dio.put(
-        "$url",
-        data: formData,
-        options: dio.Options(headers: {
-          'Authorization': 'Bearer ${siteController.getToken()}',
-        }),
-      );
-      return StandardHttpResponse.fromDIOResponse(response);
-    } catch (e) {
-      throw e;
     }
   }
 
@@ -142,7 +123,7 @@ class HttpClientImpl implements HttpRepo {
     try {
       result = await http.delete(Uri.parse(host), headers: headers(), body: json.encode(body));
       print(result);
-      if (result.statusCode == 401) sl<RoutingBloc>().add(RoutingBlocEvent_UnAuthorized());
+
       return StandardHttpResponse.fromHttpResponse(result);
     } catch (e) {
       return StandardHttpResponse(statusCode: result!.statusCode, errorMessage: result.reasonPhrase);

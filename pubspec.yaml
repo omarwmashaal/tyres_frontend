@@ -30,6 +30,8 @@ dependencies:
 
   # Router for navigation and deep linking
   go_router: ^14.3.0
+  equatable: ^2.0.5
+  flutter_bloc: ^8.1.6
 
 dev_dependencies:
   flutter_test:
