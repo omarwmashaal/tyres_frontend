@@ -1,6 +1,6 @@
 name: tyres_frontend
 description: "A new Flutter project."
-publish_to: 'none' 
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
@@ -10,8 +10,26 @@ dependencies:
   flutter:
     sdk: flutter
 
-
+  # Cupertino Icons for iOS style icons
   cupertino_icons: ^1.0.8
+
+  # Functional programming in Dart using dartz
+  dartz: ^0.10.1
+
+  # Service locator for dependency injection
+  get_it: ^8.0.1
+
+  # HTTP client for making API requests
+  dio: ^5.7.0
+
+  # Basic HTTP client for simpler API requests
+  http: ^1.2.2
+
+  # Utility for responsive UI across devices
+  flutter_screenutil: ^5.9.3
+
+  # Router for navigation and deep linking
+  go_router: ^14.3.0
 
 dev_dependencies:
   flutter_test:
@@ -19,12 +37,5 @@ dev_dependencies:
 
   flutter_lints: ^4.0.0
 
-
 flutter:
-
-        uses-material-design: true
-
-        
-    
-    
-                                      
+  uses-material-design: true
