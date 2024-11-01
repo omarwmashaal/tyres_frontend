@@ -29,6 +29,15 @@ class TyreLoadedState extends TyreState {
   @override
   List<Object?> get props => [tyre];
 }
+// State when a tyres are successfully fetched
+class TyresLoadedState extends TyreState {
+  final List<TyreEntity> tyres;
+
+  TyresLoadedState({required this.tyres});
+
+  @override
+  List<Object?> get props => [tyres];
+}
 
 // State when a tyre is successfully deleted
 class TyreDeletedState extends TyreState {

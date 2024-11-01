@@ -79,11 +79,11 @@ class TyresRepoImpl implements TyresRepo {
   }
 
   @override
-  Future<Either<Failure, TyreEntity>> getTyreBySerial(String serial) async {
+  Future<Either<Failure, List<TyreEntity>>> getTyreBySerial(String serial) async {
     try {
-      final tyreModel = await tyreDatasource.getTyreBySerial(serial);
-      final tyreEntity = tyreModel.toEntity(); // Convert Model to Entity
-      return Right(tyreEntity);
+      final tyresModel = await tyreDatasource.getTyreBySerial(serial);
+      final tyres = tyresModel.map((e) => e.toEntity()).toList(); // Convert Model to Entity
+      return Right(tyres);
     } catch (error) {
       return Left(ServerFailure(message: "Failed to get tyre by serial: $error"));
     }

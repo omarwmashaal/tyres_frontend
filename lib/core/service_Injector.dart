@@ -90,5 +90,6 @@ setUpServiceInjectors() {
         getTyresForATruckUseCase: si(),
         installTyreToATruckUseCase: si(),
         removeTyreFromATruckUseCase: si(),
+        getTyreDataUseCase: si(),
       ));
 }

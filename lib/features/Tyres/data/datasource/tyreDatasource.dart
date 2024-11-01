@@ -11,7 +11,7 @@ abstract class TyreDatasource {
   Future<NoParams> removeTyreFromATruck(int tyreId, int truckId);
   Future<NoParams> addTyre(TyreModel tyre);
   Future<NoParams> deleteTyre(int id);
-  Future<TyreModel> getTyreBySerial(String serial);
+  Future<List<TyreModel>> getTyreBySerial(String serial);
   Future<NoParams> changeTyrePosition(int truckId, TyrePositionModel newPosition);
 }
 
@@ -38,21 +38,25 @@ class TyreDatasourceImpl implements TyreDatasource {
   }
 
   @override
-  Future<TyreModel> getTyreBySerial(String serial) async {
+  Future<List<TyreModel>> getTyreBySerial(String serial) async {
     // Mock implementation for getting a tyre by serial
-    return Future.value(TyreModel(
-      id: 1,
-      truckId: 101,
-      startMileage: 5000,
-      endMileage: null,
-      serial: serial,
-      model: "Michelin X Line",
-      position: TyrePositionModel(
-        direction: enum_TyreDirection.Outer,
-        side: enum_TyreSide.Left,
-        index: 1,
-      ),
-    ));
+    return Future.value(
+      [
+        TyreModel(
+          id: 1,
+          truckId: 101,
+          startMileage: 5000,
+          endMileage: null,
+          serial: serial,
+          model: "Michelin X Line",
+          position: TyrePositionModel(
+            direction: enum_TyreDirection.Outer,
+            side: enum_TyreSide.Left,
+            index: 1,
+          ),
+        ),
+      ],
+    );
   }
 
   @override

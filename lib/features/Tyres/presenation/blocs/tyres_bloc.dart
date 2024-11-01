@@ -11,6 +11,7 @@ import 'package:tyres_frontend/features/Tyres/domain/usecases/DeleteTyreUseCase.
 import 'package:tyres_frontend/features/Tyres/domain/usecases/GetTyreBySerialUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/InstallTyreToATruckUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/RemoveTyreFromATruckUseCase.dart';
+import 'package:tyres_frontend/features/Tyres/domain/usecases/getTyreData_usecase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/getTyresForATruckUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/presenation/blocs/tyres_blocEvents.dart';
 import 'package:tyres_frontend/features/Tyres/presenation/blocs/tyres_blocStates.dart';
@@ -23,6 +24,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
   final GetTyresForATruckUseCase getTyresForATruckUseCase;
   final InstallTyreToATruckUseCase installTyreToATruckUseCase;
   final RemoveTyreFromATruckUseCase removeTyreFromATruckUseCase;
+  final GetTyreDataUseCase getTyreDataUseCase;
 
   TyreBloc({
     required this.addTyreUseCase,
@@ -32,6 +34,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     required this.getTyresForATruckUseCase,
     required this.installTyreToATruckUseCase,
     required this.removeTyreFromATruckUseCase,
+    required this.getTyreDataUseCase,
   }) : super(TyreInitialState()) {
     // Add a new tyre
     on<AddTyreEvent>((event, emit) async {
@@ -56,7 +59,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Get tyre data by ID
     on<GetTyreDataEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, TyreEntity> result = await getTyreBySerialUseCase(event.tyreId.toString());
+      final Either<Failure, TyreEntity> result = await getTyreDataUseCase(event.tyreId);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (tyre) => emit(TyreLoadedState(tyre: tyre)),
@@ -106,10 +109,10 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Get a tyre by serial number
     on<GetTyreBySerialEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, TyreEntity> result = await getTyreBySerialUseCase(event.serial);
+      final Either<Failure, List<TyreEntity>> result = await getTyreBySerialUseCase(event.serial);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
-        (tyre) => emit(TyreLoadedState(tyre: tyre)),
+        (tyre) => emit(TyresLoadedState(tyres: tyre)),
       );
     });
   }

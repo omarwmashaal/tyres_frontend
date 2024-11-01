@@ -11,6 +11,6 @@ abstract class TyresRepo {
   Future<Either<Failure, NoParams>> removeTyreFromATruck(int tyreId, int truckId);
   Future<Either<Failure, NoParams>> addTyre(TyreEntity tyre);
   Future<Either<Failure, NoParams>> deleteTyre(int id);
-  Future<Either<Failure, TyreEntity>> getTyreBySerial(String serial);
+  Future<Either<Failure, List<TyreEntity>>> getTyreBySerial(String serial);
   Future<Either<Failure, NoParams>> changeTyrePosition(int truckId, TyrePositionEntity newPosition);
 }

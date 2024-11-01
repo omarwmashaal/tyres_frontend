@@ -9,12 +9,13 @@ class TyreEntity {
   final String? model;
   final TyrePositionEntity? position;
 
-  TyreEntity(
-      {required this.id,
-      required this.truckId,
-      required this.startMileage,
-      required this.endMileage,
-      required this.serial,
-      required this.model,
-      required this.position});
+  TyreEntity({
+    this.id,
+    this.truckId,
+    this.startMileage,
+    this.endMileage,
+    this.serial,
+    this.model,
+    this.position,
+  });
 }
