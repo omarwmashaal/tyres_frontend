@@ -31,7 +31,7 @@ class TyreSearchPage extends StatelessWidget {
             // Search bar for searching tyres by plate number
             CustomTextFormField(
               controller: searchController,
-              labelText: 'Search by Plate Number',
+              labelText: 'Search by Serial Number',
               onChanged: (value) {
                 // Dispatch the search event whenever the user types in the search bar
                 tyreBloc.add(GetTyreBySerialEvent(serial: searchController.text));
@@ -64,22 +64,28 @@ class TyreSearchPage extends StatelessWidget {
                           padding: EdgeInsets.symmetric(vertical: 8.h), // Responsive vertical padding between list items
                           child: ListTile(
                             title: Text(
-                              'Plate No: ${tyre.serial ?? "N/A"}',
+                              'Serial: ${tyre.serial ?? "N/A"}',
                               style: TextStyle(fontSize: 16.sp), // Responsive text size for plate number
                             ),
-                            subtitle: Row(
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Model: ${tyre.model ?? 0}',
                                   style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
                                 ),
-                                Text(
-                                  'Start Mileage: ${tyre.startMileage ?? 0}',
-                                  style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
-                                ),
-                                Text(
-                                  'Current Mileage: ${tyre.endMileage ?? 0}',
-                                  style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Start Mileage: ${tyre.startMileage ?? 0}',
+                                      style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
+                                    ),
+                                    Text(
+                                      'Current Mileage: ${tyre.endMileage ?? 0}',
+                                      style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
