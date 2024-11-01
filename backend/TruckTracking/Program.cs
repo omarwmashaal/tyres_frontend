@@ -1,31 +1,108 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Text.Json;
 using TruckTracking.Db;
+using TruckTracking.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
-
-var app = builder.Build();
-
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("OmarWaelBayoumyAliMashaalPower3297"))
+        };
+    });
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {
     options.UseNpgsql("Host=localhost;port=5432;Database=TyresDb;Username=postgres;Password=admin");
 });
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 
-app.MapGet("/weatherforecast", () =>
+var app = builder.Build();
+app.UseCors();
+
+app.UseAuthentication();
+
+app.Use(async (context, next) =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var originalBodyStream = context.Response.Body;
+
+    using var responseBodyStream = new MemoryStream();
+    context.Response.Body = responseBodyStream;
+
+    var response = new ApiResult();
+
+    try
+    {
+        await next();
+
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        if (response.StatusCode != StatusCodes.Status200OK)
+        {
+            response.ErrorMessage = responseBody; // Capture the response body content
+        }
+        else
+            response.Data = responseBody; // Capture the response body content
+        response.isSuccess = true;
+        response.StatusCode = context.Response.StatusCode;
+    }
+    catch (Exception e)
+    {
+        response.isSuccess = false;
+        response.ErrorMessage = e.Message;
+        response.StatusCode = StatusCodes.Status500InternalServerError;
+    }
+
+
+    context.Response.Body.Seek(0, SeekOrigin.Begin);
+    context.Response.ContentType = "application/json";
+    await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+
+    responseBodyStream.Seek(0, SeekOrigin.Begin);
+    await responseBodyStream.CopyToAsync(originalBodyStream);
+    context.Response.Body = originalBodyStream;
 });
+
+app.MapGet("/register", async ([FromServices] UserManager<User> userManager, [FromQuery] String email, [FromQuery] String password, [FromQuery] String name) =>
+{
+    var result = await userManager.CreateAsync(new User { Email = email, UserName = name }, password);
+    if (result.Succeeded)
+        return Results.Ok();
+    else
+        return Results.BadRequest(result.Errors);
+
+});
+
+//app.MapGet("/login", (UserManager<User> userManager,String email,String password)=>{
+
+//});
+
+
 
 app.Run();
 

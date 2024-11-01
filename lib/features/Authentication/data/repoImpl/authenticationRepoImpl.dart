@@ -21,8 +21,8 @@ class Authenticationrepoimpl implements Authenticationrepo {
   Future<Either<Failure, NoParams>> register(String email, String password, String name) async {
     try {
       return Right(await authenticationDatasource.register(email, password, name));
-    } on Exception {
-      return Left(Failure_HttpBadRequest(message: ""));
+    } on FailureException catch (e) {
+      return Left(e.failure);
     }
   }
 }

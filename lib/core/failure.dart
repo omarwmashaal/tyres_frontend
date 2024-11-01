@@ -32,6 +32,12 @@ class FailureFactory {
   }
 }
 
+class FailureException implements Exception {
+  final Failure failure;
+
+  FailureException({required this.failure});
+}
+
 class ServerFailure extends Failure {
   ServerFailure({required super.message}) : super(code: 400);
 }
