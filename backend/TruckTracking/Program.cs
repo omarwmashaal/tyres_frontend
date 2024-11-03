@@ -37,7 +37,19 @@ builder.Services.AddDbContext<AppDbContext>((options) =>
 {
     options.UseNpgsql("Host=localhost;port=5432;Database=TyresDb;Username=postgres;Password=admin");
 });
-builder.Services.AddIdentity<User, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+        {
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequiredLength = 4;
+            options.Password.RequiredUniqueChars = 0;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireDigit = false;
+
+            options.User.RequireUniqueEmail = true;
+        })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -90,11 +102,13 @@ app.Use(async (context, next) =>
 
 app.MapGet("/register", async ([FromServices] UserManager<User> userManager, [FromQuery] String email, [FromQuery] String password, [FromQuery] String name) =>
 {
-    var result = await userManager.CreateAsync(new User { Email = email, UserName = name }, password);
+    var userName = name + email;
+    userName = userName.Replace(".","").Replace("@","").Trim().Replace(" ","");
+    var result = await userManager.CreateAsync(new User { Email = email, UserName = userName,Name=name }, password);
     if (result.Succeeded)
         return Results.Ok();
     else
-        return Results.BadRequest(result.Errors);
+        return Results.BadRequest(result.Errors.FirstOrDefault());
 
 });
 

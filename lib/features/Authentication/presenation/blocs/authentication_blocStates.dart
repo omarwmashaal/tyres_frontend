@@ -14,20 +14,15 @@ class AuthenticationInitialState extends AuthenticationState {}
 class AuthenticationLoadingState extends AuthenticationState {}
 
 // State when login is successful
-class AuthenticationLoginSuccessState extends AuthenticationState {
-  final String token;
-
-  AuthenticationLoginSuccessState({required this.token});
-
-  @override
-  List<Object?> get props => [token];
-}
+class AuthenticationLoginSuccessState extends AuthenticationState {}
 
 // State when registration is successful
 class AuthenticationRegisterSuccessState extends AuthenticationState {}
 
 // State when logout is successful
 class AuthenticationLogoutSuccessState extends AuthenticationState {}
+
+class AuthenticationUnAuthorizedState extends AuthenticationState {}
 
 // State when an error occurs
 class AuthenticationErrorState extends AuthenticationState {

@@ -20,10 +20,10 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     // Handle login event
     on<LoginEvent>((event, emit) async {
       emit(AuthenticationLoadingState());
-      final Either<Failure, String> result = await loginUseCase(event.loginModel);
+      final Either<Failure, NoParams> result = await loginUseCase(event.loginModel);
       result.fold(
         (failure) => emit(AuthenticationErrorState(message: failure.message)),
-        (token) => emit(AuthenticationLoginSuccessState(token: token)),
+        (token) => emit(AuthenticationLoginSuccessState()),
       );
     });
 

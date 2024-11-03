@@ -1,5 +1,8 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tyres_frontend/core/Widgets/globalAuthBloc.dart';
 import 'package:tyres_frontend/core/httpRepo.dart';
+import 'package:tyres_frontend/core/sharedPreferencesDatasource.dart';
 import 'package:tyres_frontend/features/Authentication/data/datasource/authentication_datasource.dart';
 import 'package:tyres_frontend/features/Authentication/data/repoImpl/authenticationRepoImpl.dart';
 import 'package:tyres_frontend/features/Authentication/domain/repo/authenticationRepo.dart';
@@ -30,15 +33,23 @@ import 'package:tyres_frontend/features/Tyres/presenation/blocs/tyres_bloc.dart'
 
 var si = GetIt.instance;
 
-setUpServiceInjectors() {
+setUpServiceInjectors() async {
   //?core
-  si.registerLazySingleton<HttpRepo>(() => HttpClientImpl());
-
+  si.registerSingletonAsync<SharedPreferences>(() async => await SharedPreferences.getInstance());
+  si.registerLazySingleton(() => Globalauthbloc());
+  si.registerLazySingleton<HttpRepo>(() => HttpClientImpl(
+        sharedPreferences: si(),
+        authenticationBloc: si(),
+      ));
+  si.registerLazySingleton<Sharedpreferencesdatasource>(() => SharedPreferencesDatasourceImpl(sharedPreferences: si()));
   //?Authentication
   //datsources
   si.registerLazySingleton<AuthenticationDatasource>(() => AuthenticationDatasourceImpl(httpRepo: si()));
   //repo
-  si.registerLazySingleton<Authenticationrepo>(() => Authenticationrepoimpl(authenticationDatasource: si()));
+  si.registerLazySingleton<Authenticationrepo>(() => Authenticationrepoimpl(
+        authenticationDatasource: si(),
+        sharedPreferencesDatasource: si(),
+      ));
   //usecases
   si.registerLazySingleton(() => LoginUseCase(authenticationrepo: si()));
   si.registerLazySingleton(() => RegisterUseCase(authenticationrepo: si()));

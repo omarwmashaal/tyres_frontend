@@ -14,13 +14,6 @@ setHosts() async {}
 final serverHost = "${_host}";
 final signalRHost = "${_host}notificationhub";
 var token = "";
-Map<String, String> headers() => <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,PUT,PATCH,POST,DELETE",
-      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
-      "Authorization": "Bearer $token",
-    };
 
 /***********************************
  * Controllers

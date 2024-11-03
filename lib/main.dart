@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tyres_frontend/core/Widgets/globalAuthBloc.dart';
 import 'package:tyres_frontend/core/router.dart';
 import 'package:tyres_frontend/core/service_injector.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_bloc.dart';
+import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocStates.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_bloc.dart';
 import 'package:tyres_frontend/features/Tyres/presenation/blocs/tyres_bloc.dart'; // Your GetIt service injector setup
 
@@ -13,7 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize GetIt and all other necessary services.
-  setUpServiceInjectors();
+  await setUpServiceInjectors();
 
   runApp(MyApp());
 }
@@ -32,15 +34,21 @@ class MyApp extends StatelessWidget {
             BlocProvider(create: (context) => si<AuthenticationBloc>()),
             BlocProvider(create: (context) => si<TruckBloc>()),
             BlocProvider(create: (context) => si<TyreBloc>()),
+            BlocProvider(create: (context) => si<Globalauthbloc>()),
           ],
-          child: MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            title: 'Tyres App',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
+          child: BlocListener<Globalauthbloc, AuthenticationState>(
+            listener: (context, state) {
+              if (state is AuthenticationUnAuthorizedState) context.go("/");
+            },
+            child: MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              title: 'Tyres App',
+              theme: ThemeData(
+                primarySwatch: Colors.blue,
+                visualDensity: VisualDensity.adaptivePlatformDensity,
+              ),
+              routerConfig: _router, // GoRouter configuration
             ),
-            routerConfig: _router, // GoRouter configuration
           ),
         );
       },

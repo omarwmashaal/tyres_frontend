@@ -6,5 +6,6 @@ namespace TruckTracking.Models
 {
     public class User: IdentityUser
     {
+        public String Name { get; set; }
     }
 }

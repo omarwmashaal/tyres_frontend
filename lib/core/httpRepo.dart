@@ -4,7 +4,12 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as dio;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tyres_frontend/core/Widgets/globalAuthBloc.dart';
 import 'package:tyres_frontend/core/remoteConstats.dart';
+import 'package:tyres_frontend/core/sharedPreferencesDatasource.dart';
+import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_bloc.dart';
+import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocStates.dart';
 
 class StandardHttpResponse {
   final Object? data;
@@ -63,13 +68,33 @@ abstract class HttpRepo {
 }
 
 class HttpClientImpl implements HttpRepo {
+  final Globalauthbloc authenticationBloc;
+  final Sharedpreferencesdatasource sharedPreferences;
+
+  HttpClientImpl({
+    required this.authenticationBloc,
+    required this.sharedPreferences,
+  });
+  _getHeaders() {
+    var token = sharedPreferences.getValue("token");
+    var headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,PUT,PATCH,POST,DELETE",
+      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+      "Authorization": "Bearer $token",
+    };
+    return headers;
+  }
+
   @override
   Future<StandardHttpResponse> get({required String host}) async {
     late http.Response result;
 
-    result = await http.get(Uri.parse("http://localhost:5205/$host"), headers: headers()).catchError((e) {
+    result = await http.get(Uri.parse("http://localhost:5205/$host"), headers: _getHeaders()).catchError((e) {
       return http.Response(e.toString(), 500);
     });
+    if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
 
     return StandardHttpResponse.fromHttpResponse(result);
   }
@@ -77,39 +102,36 @@ class HttpClientImpl implements HttpRepo {
   @override
   Future<StandardHttpResponse> post({required String host, dynamic? body}) async {
     late http.Response result;
-    try {
-      result = await http.post(Uri.parse(host), headers: headers(), body: json.encode(body));
 
-      return StandardHttpResponse.fromHttpResponse(result);
-    } catch (e) {
-      return StandardHttpResponse(statusCode: result!.statusCode, errorMessage: result.reasonPhrase);
-    }
+    result = await http.post(Uri.parse("http://localhost:5205/$host"), headers: _getHeaders(), body: json.encode(body)).catchError((e) {
+      return http.Response(e.toString(), 500);
+    });
+    if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
+
+    return StandardHttpResponse.fromHttpResponse(result);
   }
 
   @override
   Future<StandardHttpResponse> put({required String host, dynamic? body}) async {
     late http.Response result;
-    print("put");
-    try {
-      result = await http.put(Uri.parse(host), headers: headers(), body: json.encode(body));
-      print(result);
 
-      return StandardHttpResponse.fromHttpResponse(result);
-    } catch (e) {
-      return StandardHttpResponse(statusCode: result!.statusCode, errorMessage: result.reasonPhrase);
-    }
+    result = await http.put(Uri.parse("http://localhost:5205/$host"), headers: _getHeaders(), body: json.encode(body)).catchError((e) {
+      return http.Response(e.toString(), 500);
+    });
+    if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
+
+    return StandardHttpResponse.fromHttpResponse(result);
   }
 
   @override
   Future<StandardHttpResponse> delete({required String host, body}) async {
     late http.Response result;
-    try {
-      result = await http.delete(Uri.parse(host), headers: headers(), body: json.encode(body));
-      print(result);
 
-      return StandardHttpResponse.fromHttpResponse(result);
-    } catch (e) {
-      return StandardHttpResponse(statusCode: result!.statusCode, errorMessage: result.reasonPhrase);
-    }
+    result = await http.delete(Uri.parse("http://localhost:5205/$host"), headers: _getHeaders()).catchError((e) {
+      return http.Response(e.toString(), 500);
+    });
+    if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
+
+    return StandardHttpResponse.fromHttpResponse(result);
   }
 }

@@ -12,8 +12,8 @@ using TruckTracking.Db;
 namespace TruckTracking.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241101200811_init")]
-    partial class init
+    [Migration("20241103145535_addNameToUser")]
+    partial class addNameToUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,10 @@ namespace TruckTracking.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("text");
