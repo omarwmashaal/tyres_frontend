@@ -99,7 +99,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Remove a tyre from a truck
     on<RemoveTyreFromTruckEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, NoParams> result = await removeTyreFromATruckUseCase(event.params);
+      final Either<Failure, NoParams> result = await removeTyreFromATruckUseCase(event.tyreId);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (_) => emit(TyreRemovedFromTruckState()),

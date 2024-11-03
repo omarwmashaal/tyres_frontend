@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               title: 'Tyres App',
               theme: ThemeData(
-                primarySwatch: Colors.blue,
+                colorSchemeSeed: Colors.white,
                 visualDensity: VisualDensity.adaptivePlatformDensity,
               ),
               routerConfig: _router, // GoRouter configuration

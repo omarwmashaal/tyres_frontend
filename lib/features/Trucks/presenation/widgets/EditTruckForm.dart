@@ -43,15 +43,6 @@ class _EditTruckFormState extends State<EditTruckForm> {
     return Column(
       mainAxisSize: MainAxisSize.min, // Makes the modal adjust dynamically
       children: [
-        // Plate Number Field
-        TextField(
-          controller: plateNoController,
-          decoration: InputDecoration(
-            labelText: 'Plate Number',
-          ),
-        ),
-        SizedBox(height: 16.h), // Responsive spacing
-
         // Mileage Field
         TextField(
           controller: mileageController,

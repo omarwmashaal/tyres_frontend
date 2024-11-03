@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:tyres_frontend/features/Tyres/domain/entities/tyreEnums.dart';
 import 'package:tyres_frontend/features/Tyres/domain/entities/tyrePositionEntity.dart';
 
@@ -69,7 +71,24 @@ class TyrePositionModel {
   }
 
   @override
-  int get hashCode {
-    return direction.hashCode ^ side.hashCode ^ index.hashCode;
+  int get hashCode => direction.hashCode ^ side.hashCode ^ index.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'direction': direction.index,
+      'side': side.index,
+      'index': index,
+    };
   }
+
+  factory TyrePositionModel.fromMap(Map<String, dynamic> map) {
+    return TyrePositionModel(
+      direction: enum_TyreDirection.values[map['direction']],
+      side: enum_TyreSide.values[map['side']],
+      index: map['index']?.toInt() ?? 0,
+    );
+  }
+
+  @override
+  String toString() => 'TyrePositionModel(direction: $direction, side: $side, index: $index)';
 }

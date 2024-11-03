@@ -63,7 +63,7 @@ class GetTyresForATruckEvent extends TyreEvent {
 
 // Event to install a tyre on a truck
 class InstallTyreOnTruckEvent extends TyreEvent {
-  final InstallTyreParams params;
+  final TyreEntity params;
 
   InstallTyreOnTruckEvent({required this.params});
 
@@ -73,12 +73,12 @@ class InstallTyreOnTruckEvent extends TyreEvent {
 
 // Event to remove a tyre from a truck
 class RemoveTyreFromTruckEvent extends TyreEvent {
-  final RemoveTyreParams params;
+  final int tyreId;
 
-  RemoveTyreFromTruckEvent({required this.params});
+  RemoveTyreFromTruckEvent({required this.tyreId});
 
   @override
-  List<Object?> get props => [params];
+  List<Object?> get props => [tyreId];
 }
 
 // Event to get a tyre by serial number

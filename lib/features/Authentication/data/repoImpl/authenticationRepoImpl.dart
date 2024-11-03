@@ -19,8 +19,8 @@ class Authenticationrepoimpl implements Authenticationrepo {
       var token = await authenticationDatasource.login(email, password);
       await sharedPreferencesDatasource.setValue("token", token);
       return Right(NoParams());
-    } on Exception {
-      return Left(Failure_HttpBadRequest(message: ""));
+    } on FailureException catch (e) {
+      return Left(e.failure);
     }
   }
 

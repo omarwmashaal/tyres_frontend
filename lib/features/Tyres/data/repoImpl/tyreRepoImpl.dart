@@ -21,8 +21,8 @@ class TyresRepoImpl implements TyresRepo {
       final tyreModel = await tyreDatasource.getTyreData(id);
       final tyreEntity = tyreModel.toEntity(); // Convert Model to Entity
       return Right(tyreEntity);
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to get tyre data: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 
@@ -32,28 +32,29 @@ class TyresRepoImpl implements TyresRepo {
       final tyreModels = await tyreDatasource.getTyresForATruck(truckId);
       final tyreEntities = tyreModels.map((model) => model.toEntity()).toList(); // Convert Models to Entities
       return Right(tyreEntities);
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to get tyres for truck: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 
   @override
-  Future<Either<Failure, NoParams>> installTyreToATruck(int tyreId, int truckId) async {
+  Future<Either<Failure, NoParams>> installTyreToATruck(TyreEntity tyre) async {
     try {
-      await tyreDatasource.installTyreToATruck(tyreId, truckId);
+      var tyreModel = TyreModel.fromEntity(tyre);
+      await tyreDatasource.installTyreToATruck(tyreModel);
       return Right(NoParams());
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to install tyre to truck: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 
   @override
-  Future<Either<Failure, NoParams>> removeTyreFromATruck(int tyreId, int truckId) async {
+  Future<Either<Failure, NoParams>> removeTyreFromATruck(int tyreId) async {
     try {
-      await tyreDatasource.removeTyreFromATruck(tyreId, truckId);
+      await tyreDatasource.removeTyreFromATruck(tyreId);
       return Right(NoParams());
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to remove tyre from truck: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 
@@ -63,8 +64,8 @@ class TyresRepoImpl implements TyresRepo {
       final tyreModel = TyreModel.fromEntity(tyre); // Convert Entity to Model
       await tyreDatasource.addTyre(tyreModel);
       return Right(NoParams());
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to add tyre: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 
@@ -73,8 +74,8 @@ class TyresRepoImpl implements TyresRepo {
     try {
       await tyreDatasource.deleteTyre(id);
       return Right(NoParams());
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to delete tyre: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 
@@ -84,8 +85,8 @@ class TyresRepoImpl implements TyresRepo {
       final tyresModel = await tyreDatasource.getTyreBySerial(serial);
       final tyres = tyresModel.map((e) => e.toEntity()).toList(); // Convert Model to Entity
       return Right(tyres);
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to get tyre by serial: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 
@@ -95,8 +96,8 @@ class TyresRepoImpl implements TyresRepo {
       final positionModel = TyrePositionModel.fromEntity(newPosition); // Convert Entity to Model
       await tyreDatasource.changeTyrePosition(truckId, positionModel);
       return Right(NoParams());
-    } catch (error) {
-      return Left(ServerFailure(message: "Failed to change tyre position: $error"));
+    } on FailureException catch (error) {
+      return Left(error.failure!);
     }
   }
 }

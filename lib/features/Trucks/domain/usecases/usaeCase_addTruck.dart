@@ -13,6 +13,12 @@ class AddTruckUseCase extends UseCase<TruckEntity, TruckEntity> {
   AddTruckUseCase({required this.truckrepo});
   @override
   Future<Either<Failure, TruckEntity>> call(TruckEntity params) async {
+    try {
+      assert(params.platNo != null, "Invalid Plat No");
+      assert(params.currentMileage != null, "Invalid Milleage");
+    } on AssertionError catch (e) {
+      return Left(Failure_HttpBadRequest(message: e.message?.toString() ?? ""));
+    }
     return await truckrepo.addTrcuk(params).then((value) {
       return value.fold(
         (l) => Left(l..message = "Add Truck: ${l.message}"),

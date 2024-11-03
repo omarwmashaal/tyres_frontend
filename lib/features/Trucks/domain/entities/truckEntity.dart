@@ -5,6 +5,15 @@ class TruckEntity {
   final String? platNo;
   final int? currentMileage;
   final List<int>? tyreIds;
+  final List<TyreEntity>? tyres;
+  final DateTime? lastUpdatedMileageDate;
 
-  TruckEntity({required this.id, required this.platNo, required this.currentMileage, this.tyreIds});
+  TruckEntity({
+    required this.id,
+    required this.platNo,
+    required this.currentMileage,
+    this.tyreIds,
+    this.tyres,
+    this.lastUpdatedMileageDate,
+  });
 }

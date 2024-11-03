@@ -10,21 +10,21 @@ class FailureFactory {
   static Failure createFailure(int statusCode, String message) {
     switch (statusCode) {
       case 400:
-        return Failure_HttpBadRequest(message: message);
+        return Failure_HttpBadRequest(message: "Bad Request: $message");
       case 401:
-        return Failure_HttpUnauthorized(message: message);
+        return Failure_HttpUnauthorized(message: "UnAuthorized: $message");
       case 403:
-        return Failure_HttpForbidden(message: message);
+        return Failure_HttpForbidden(message: "Forbidden: $message");
       case 404:
-        return Failure_HttpNotFound(message: message);
+        return Failure_HttpNotFound(message: "Not Found: $message");
       case 500:
-        return Failure_HttpInternalServerError(message: message);
+        return Failure_HttpInternalServerError(message: "Server Error: $message");
       case 501:
-        return Failure_HttpNotImplemented(message: message);
+        return Failure_HttpNotImplemented(message: "UnImplemented: $message");
       case 502:
-        return Failure_HttpBadGateway(message: message);
+        return Failure_HttpBadGateway(message: "Bad Gatewat: $message");
       case 503:
-        return Failure_HttpServiceUnavailable(message: message);
+        return Failure_HttpServiceUnavailable(message: "Service Unavailable: $message");
       default:
         // Return a generic Failure if the status code is not handled.
         return Failure_HttpUknownFailure(message: "Unknown error");

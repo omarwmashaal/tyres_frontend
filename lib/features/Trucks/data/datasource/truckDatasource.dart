@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:tyres_frontend/core/failure.dart';
 import 'package:tyres_frontend/core/httpRepo.dart';
 import 'package:tyres_frontend/core/usecase/usecases.dart';
 import 'package:tyres_frontend/features/Trucks/data/models/truckModel.dart';
@@ -16,12 +19,30 @@ class TruckDatasourceImpl implements Truckdatasource {
   TruckDatasourceImpl({required this.httpRepo});
   @override
   Future<TruckModel> addTrcuk(TruckModel truck) async {
-    return TruckModel(id: 1, platNo: "platNo", currentMileage: 22);
+    var result = await httpRepo.post(host: "addTruck", body: truck.toJson());
+    if (result.statusCode == 200) {
+      return TruckModel.fromJson((json.decode(result.data as String)));
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
   }
 
   @override
   Future<TruckModel> getTruckData(int id) async {
-    return TruckModel(id: 1, platNo: "platNo", currentMileage: 22);
+    var result = await httpRepo.get(host: "getTruck?id=$id");
+    if (result.statusCode == 200) {
+      return TruckModel.fromJson((json.decode(result.data as String)));
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
   }
 
   @override
@@ -31,11 +52,29 @@ class TruckDatasourceImpl implements Truckdatasource {
 
   @override
   Future<List<TruckModel>> searchTrucks(String search) async {
-    return [TruckModel(id: 1, platNo: "platNo", currentMileage: 22)];
+    var result = await httpRepo.get(host: "searchTrucks?${search.isEmpty ? "" : "search=$search"}");
+    if (result.statusCode == 200) {
+      return (json.decode(result.data as String) as List<dynamic>).map((e) => TruckModel.fromJson(e as Map<String, dynamic>)).toList();
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
   }
 
   @override
   Future<TruckModel> udpateTruckData(TruckModel data) async {
-    return TruckModel(id: 1, platNo: "platNo", currentMileage: 22);
+    var result = await httpRepo.put(host: "updateTruck", body: data.toJson());
+    if (result.statusCode == 200) {
+      return TruckModel.fromJson((json.decode(result.data as String)));
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
   }
 }

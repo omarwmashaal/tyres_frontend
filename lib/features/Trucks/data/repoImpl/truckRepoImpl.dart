@@ -16,8 +16,8 @@ class Truckrepoimpl implements Truckrepo {
       var truckModel = TruckModel.fromEntity(truck);
       var result = await truckdatasource.addTrcuk(truckModel);
       return Right(result.toEntity());
-    } on Exception {
-      return Left(Failure_HttpBadRequest(message: ""));
+    } on FailureException catch (e) {
+      return Left(e.failure);
     }
   }
 
@@ -26,8 +26,8 @@ class Truckrepoimpl implements Truckrepo {
     try {
       var result = await truckdatasource.getTruckData(id);
       return Right(result.toEntity());
-    } on Exception {
-      return Left(Failure_HttpBadRequest(message: ""));
+    } on FailureException catch (e) {
+      return Left(e.failure);
     }
   }
 
@@ -35,8 +35,8 @@ class Truckrepoimpl implements Truckrepo {
   Future<Either<Failure, NoParams>> removeTruck(int id) async {
     try {
       return Right(await truckdatasource.removeTruck(id));
-    } on Exception {
-      return Left(Failure_HttpBadRequest(message: ""));
+    } on FailureException catch (e) {
+      return Left(e.failure);
     }
   }
 
@@ -45,8 +45,8 @@ class Truckrepoimpl implements Truckrepo {
     try {
       var result = await truckdatasource.searchTrucks(search);
       return Right(result.map((x) => x.toEntity()).toList());
-    } on Exception {
-      return Left(Failure_HttpBadRequest(message: ""));
+    } on FailureException catch (e) {
+      return Left(e.failure);
     }
   }
 
@@ -56,8 +56,8 @@ class Truckrepoimpl implements Truckrepo {
       var truckModel = TruckModel.fromEntity(data);
       var result = await truckdatasource.udpateTruckData(truckModel);
       return Right(result.toEntity());
-    } on Exception {
-      return Left(Failure_HttpBadRequest(message: ""));
+    } on FailureException catch (e) {
+      return Left(e.failure);
     }
   }
 }

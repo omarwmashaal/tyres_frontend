@@ -16,115 +16,121 @@ class TruckSearchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Access the TruckBloc directly using BlocProvider
     final truckBloc = BlocProvider.of<TruckBloc>(context);
+    truckBloc.add(SearchTrucksEvent(searchTerm: ""));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Search Trucks',
-          style: TextStyle(fontSize: 18.sp), // Responsive text size for app bar title
+    return BlocListener<TruckBloc, TruckState>(
+      listener: (context, state) {
+        if (state is TruckAddedState) truckBloc.add(SearchTrucksEvent(searchTerm: ""));
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Search Trucks',
+            style: TextStyle(fontSize: 18.sp), // Responsive text size for app bar title
+          ),
         ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.w), // Responsive padding
-        child: Column(
-          children: [
-            // Search bar for searching trucks by plate number
-            CustomTextFormField(
-              controller: searchController,
-              labelText: 'Search by Plate Number',
-              onChanged: (value) {
-                // Dispatch the search event whenever the user types in the search bar
-                truckBloc.add(SearchTrucksEvent(searchTerm: value));
-              },
-            ),
-            SizedBox(height: 16.h), // Responsive spacing
+        body: Padding(
+          padding: EdgeInsets.all(16.w), // Responsive padding
+          child: Column(
+            children: [
+              // Search bar for searching trucks by plate number
+              CustomTextFormField(
+                controller: searchController,
+                labelText: 'Search by Plate Number',
+                onChanged: (value) {
+                  // Dispatch the search event whenever the user types in the search bar
+                  truckBloc.add(SearchTrucksEvent(searchTerm: value));
+                },
+              ),
+              SizedBox(height: 16.h), // Responsive spacing
 
-            // Display truck list based on the current bloc state
-            Expanded(
-              child: BlocBuilder<TruckBloc, TruckState>(
-                builder: (context, state) {
-                  if (state is TruckLoadingState) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (state is TrucksSearchedState) {
-                    if (state.trucks.isEmpty) {
+              // Display truck list based on the current bloc state
+              Expanded(
+                child: BlocBuilder<TruckBloc, TruckState>(
+                  builder: (context, state) {
+                    if (state is TruckLoadingState) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (state is TrucksSearchedState) {
+                      if (state.trucks.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No trucks found.',
+                            style: TextStyle(fontSize: 16.sp), // Responsive text
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: state.trucks.length,
+                        itemBuilder: (context, index) {
+                          final TruckEntity truck = state.trucks[index];
+
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.h), // Responsive vertical padding between list items
+                            child: ListTile(
+                              title: Text(
+                                'Plate No: ${truck.platNo ?? "N/A"}',
+                                style: TextStyle(fontSize: 16.sp), // Responsive text size for plate number
+                              ),
+                              subtitle: Text(
+                                'Mileage: ${truck.currentMileage ?? 0} km',
+                                style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
+                              ),
+                              onTap: () {
+                                // Navigate to truck details or edit page
+                                context.go('/truck-details/${truck.id}');
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    } else if (state is TruckErrorState) {
                       return Center(
                         child: Text(
-                          'No trucks found.',
-                          style: TextStyle(fontSize: 16.sp), // Responsive text
+                          'Error: ${state.message}',
+                          style: TextStyle(fontSize: 16.sp), // Responsive text size for error message
                         ),
                       );
                     }
 
-                    return ListView.builder(
-                      itemCount: state.trucks.length,
-                      itemBuilder: (context, index) {
-                        final TruckEntity truck = state.trucks[index];
-
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h), // Responsive vertical padding between list items
-                          child: ListTile(
-                            title: Text(
-                              'Plate No: ${truck.platNo ?? "N/A"}',
-                              style: TextStyle(fontSize: 16.sp), // Responsive text size for plate number
-                            ),
-                            subtitle: Text(
-                              'Mileage: ${truck.currentMileage ?? 0} km',
-                              style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
-                            ),
-                            onTap: () {
-                              // Navigate to truck details or edit page
-                              context.go('/truck-details/${truck.id}');
-                            },
-                          ),
-                        );
-                      },
-                    );
-                  } else if (state is TruckErrorState) {
+                    // Default state when no interaction or data is available
                     return Center(
                       child: Text(
-                        'Error: ${state.message}',
-                        style: TextStyle(fontSize: 16.sp), // Responsive text size for error message
+                        'Start searching for trucks.',
+                        style: TextStyle(fontSize: 16.sp), // Responsive text size for default message
                       ),
                     );
-                  }
-
-                  // Default state when no interaction or data is available
-                  return Center(
-                    child: Text(
-                      'Start searching for trucks.',
-                      style: TextStyle(fontSize: 16.sp), // Responsive text size for default message
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      // Single floating action button for adding a new truck
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Show modal bottom sheet for adding a new truck
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true, // Ensures the modal is full-height
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-            ),
-            builder: (BuildContext context) {
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard
-                  top: 16.h,
-                  left: 16.w,
-                  right: 16.w,
+                  },
                 ),
-                child: AddTruckForm(truckBloc: truckBloc),
-              );
-            },
-          );
-        },
-        child: Icon(Icons.add, size: 24.sp), // Responsive icon size
+              ),
+            ],
+          ),
+        ),
+        // Single floating action button for adding a new truck
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Show modal bottom sheet for adding a new truck
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true, // Ensures the modal is full-height
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+              ),
+              builder: (BuildContext context) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard
+                    top: 16.h,
+                    left: 16.w,
+                    right: 16.w,
+                  ),
+                  child: AddTruckForm(truckBloc: truckBloc),
+                );
+              },
+            );
+          },
+          child: Icon(Icons.add, size: 24.sp), // Responsive icon size
+        ),
       ),
     );
   }

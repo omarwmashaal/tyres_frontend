@@ -14,11 +14,16 @@ class AuthenticationDatasourceImpl implements AuthenticationDatasource {
   AuthenticationDatasourceImpl({required this.httpRepo});
   @override
   Future<String> login(String email, String password) async {
-    var result = await httpRepo.get(host: "$authenticationController?email=$email&password=$password");
+    var result = await httpRepo.get(host: "login?email=$email&password=$password");
     if (result.statusCode == 200) {
       return result.data as String;
     } else
-      throw Exception();
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
   }
 
   @override

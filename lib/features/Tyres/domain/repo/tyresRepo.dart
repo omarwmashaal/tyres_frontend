@@ -7,8 +7,8 @@ import 'package:tyres_frontend/features/Tyres/domain/entities/tyrePositionEntity
 abstract class TyresRepo {
   Future<Either<Failure, TyreEntity>> getTyreData(int id);
   Future<Either<Failure, List<TyreEntity>>> getTyresForATruck(int truckId);
-  Future<Either<Failure, NoParams>> installTyreToATruck(int tyreId, int truckId);
-  Future<Either<Failure, NoParams>> removeTyreFromATruck(int tyreId, int truckId);
+  Future<Either<Failure, NoParams>> installTyreToATruck(TyreEntity tyre);
+  Future<Either<Failure, NoParams>> removeTyreFromATruck(int tyreId);
   Future<Either<Failure, NoParams>> addTyre(TyreEntity tyre);
   Future<Either<Failure, NoParams>> deleteTyre(int id);
   Future<Either<Failure, List<TyreEntity>>> getTyreBySerial(String serial);

@@ -78,11 +78,11 @@ class TyreSearchPage extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Start Mileage: ${tyre.startMileage ?? 0}',
+                                      'Tyre Start Mileage: ${tyre.startMileage ?? 0}',
                                       style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
                                     ),
                                     Text(
-                                      'Current Mileage: ${tyre.endMileage ?? 0}',
+                                      'Tyre Current Mileage: ${tyre.endMileage ?? 0}',
                                       style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
                                     ),
                                   ],
