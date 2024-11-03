@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tyres_frontend/core/Widgets/globalAuthBloc.dart';
+import 'package:tyres_frontend/core/service_Injector.dart';
+import 'package:tyres_frontend/core/sharedPreferencesDatasource.dart';
+import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocStates.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/pages/loginPage.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/pages/registerPage.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/pages/TruckSearchPage.dart';
@@ -15,6 +20,11 @@ class AppRouter {
     routes: <RouteBase>[
       GoRoute(
         path: '/login',
+        redirect: (context, state) {
+          if ((si<Sharedpreferencesdatasource>().getValue("token")?.toString() ?? "") != "") {
+            return "/trucks";
+          }
+        },
         builder: (context, state) => LoginPage(),
       ),
       GoRoute(
@@ -24,7 +34,18 @@ class AppRouter {
       ShellRoute(
         builder: (context, state, child) {
           return Scaffold(
-            body: child,
+            body: BlocListener<Globalauthbloc, AuthenticationState>(
+              listener: (context, state) {
+                if (state is AuthenticationUnAuthorizedState) {
+                  context.go("/login");
+                  si<Sharedpreferencesdatasource>().setValue("token", "");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Please Login!")),
+                  );
+                }
+              },
+              child: child,
+            ),
             bottomNavigationBar: Obx(
               () => BottomNavigationBar(
                 currentIndex: navBarIndex.value,

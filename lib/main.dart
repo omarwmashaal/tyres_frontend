@@ -36,19 +36,14 @@ class MyApp extends StatelessWidget {
             BlocProvider(create: (context) => si<TyreBloc>()),
             BlocProvider(create: (context) => si<Globalauthbloc>()),
           ],
-          child: BlocListener<Globalauthbloc, AuthenticationState>(
-            listener: (context, state) {
-              if (state is AuthenticationUnAuthorizedState) context.go("/");
-            },
-            child: MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              title: 'Tyres App',
-              theme: ThemeData(
-                colorSchemeSeed: Colors.white,
-                visualDensity: VisualDensity.adaptivePlatformDensity,
-              ),
-              routerConfig: _router, // GoRouter configuration
+          child: MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            title: 'Tyres App',
+            theme: ThemeData(
+              colorSchemeSeed: Colors.white,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
+            routerConfig: _router, // GoRouter configuration
           ),
         );
       },

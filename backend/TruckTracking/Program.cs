@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,57 +10,75 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using TruckTracking;
 using TruckTracking.Db;
 using TruckTracking.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Identity
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 4;
+    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireDigit = false;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
+
+// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    options.AddDefaultPolicy(policyBuilder =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policyBuilder.AllowAnyOrigin()
+                 .AllowAnyMethod()
+                 .AllowAnyHeader();
     });
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// Configure JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("OmarWaelBayoumyAliMashaalPower3297"))
-        };
-    });
-builder.Services.AddDbContext<AppDbContext>((options) =>
+        ValidateIssuer = true,
+        ValidIssuer = "YourIssuer",
+
+        ValidateAudience = true,
+        ValidAudience = "YourAudience",
+
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("OmarWaelBayoumyAliMashaalPower3297"))
+    };
+});
+
+// Configure Database
+builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql("Host=localhost;port=5432;Database=TyresDb;Username=postgres;Password=admin");
 });
-builder.Services.AddIdentity<User, IdentityRole>(options =>
-        {
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequiredLength = 4;
-            options.Password.RequiredUniqueChars = 0;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireDigit = false;
 
-            options.User.RequireUniqueEmail = true;
-        })
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
+// Configure Authorization
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
-app.UseCors();
 
+app.UseCors();
 app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.Use(async (context, next) =>
 {
@@ -111,35 +130,23 @@ app.MapGet("/register", async ([FromServices] UserManager<User> userManager, [Fr
         return Results.BadRequest(result.Errors.FirstOrDefault());
 
 });
-
-app.MapGet("/login", async ([FromServices] UserManager<User> userManager, [FromServices] SignInManager<User> signInManager, [FromQuery] String email, [FromQuery] String password) =>
+app.MapGet("/login", [AllowAnonymous] async ([FromServices] UserManager<User> userManager, [FromServices] SignInManager<User> signInManager, [FromQuery] string email, [FromQuery] string password) =>
 {
     var user = await userManager.FindByEmailAsync(email);
     if (user == null)
         return Results.BadRequest("Invalid Email Or Password");
+
     var result = await signInManager.CheckPasswordSignInAsync(user, password, false);
     if (!result.Succeeded)
         return Results.BadRequest("Invalid Email Or Password");
 
-    var tokenHandler = new JwtSecurityTokenHandler();
-    var key = Encoding.UTF8.GetBytes("OmarWaelBayoumyAliMashaalPower3297");
-    var tokenDescriptor = new SecurityTokenDescriptor
-    {
-        Subject = new ClaimsIdentity(new[] {
-            new Claim(ClaimTypes.Name, user.Name),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Email, user.Email),
-        }),
-        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-    };
-
-    var token = tokenHandler.CreateToken(tokenDescriptor);
-    var tokenString = tokenHandler.WriteToken(token);
+    // Generate the JWT token
+    var tokenString = GenerateToken.GenerateJWTToken(user);
     return Results.Ok(tokenString);
 });
 
 
-app.MapGet("/searchTrucks", async ([FromServices] AppDbContext dbContext, [FromQuery] String? search) =>
+app.MapGet("/searchTrucks", [Authorize] async ([FromServices] AppDbContext dbContext, [FromQuery] String? search) =>
 {
     List<Truck> trucks = new List<Truck>();
     if (search == null)
@@ -154,9 +161,9 @@ app.MapGet("/searchTrucks", async ([FromServices] AppDbContext dbContext, [FromQ
 });
 app.MapGet("/getTruck", async ([FromServices] AppDbContext dbContext, [FromQuery] int id) =>
 {
-    var truck = await dbContext.Trucks.Include(x=>x.Tyres).FirstOrDefaultAsync(x => x.Id == id);
+    var truck = await dbContext.Trucks.Include(x => x.Tyres).FirstOrDefaultAsync(x => x.Id == id);
     if (truck == null)
-    {       
+    {
         return Results.BadRequest("Truck Not Found!");
     }
     foreach (var tyre in truck.Tyres)
@@ -186,7 +193,7 @@ app.MapPost("/addTruck", async ([FromServices] AppDbContext dbContext, [FromBody
 app.MapPut("/updateTruck", async ([FromServices] AppDbContext dbContext, [FromBody] Truck truck) =>
 {
     var found = await dbContext.Trucks.FirstOrDefaultAsync(x => x.PlatNo!.ToLower() == truck.PlatNo!.ToLower());
-    if (found==null)
+    if (found == null)
         return Results.BadRequest("Truck Not Found!");
     found.CurrentMileage = truck.CurrentMileage;
     found.LastUpdatedMileageDate = DateTime.UtcNow;
@@ -199,8 +206,8 @@ app.MapPut("/updateTruck", async ([FromServices] AppDbContext dbContext, [FromBo
 app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromBody] Tyre tyre) =>
 {
     var tyreInDb = await dbContext.Tyres.FirstOrDefaultAsync(x => x.Serial.ToLower() == tyre.Serial.ToLower());
-    var truck = await dbContext.Trucks.Include(x=>x.Tyres).FirstOrDefaultAsync(x => x.Id == tyre.TruckId);
-    if(tyreInDb==null)
+    var truck = await dbContext.Trucks.Include(x => x.Tyres).FirstOrDefaultAsync(x => x.Id == tyre.TruckId);
+    if (tyreInDb == null)
     {
         tyreInDb = new Tyre
         {
@@ -208,8 +215,8 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
             Serial = tyre.Serial,
             Position = tyre.Position,
             TruckId = tyre.TruckId,
-            StartMileage = truck!.CurrentMileage??0, 
-            EndMileage = truck!.CurrentMileage?? 0,    
+            StartMileage = truck!.CurrentMileage ?? 0,
+            EndMileage = truck!.CurrentMileage ?? 0,
             AddedDate = DateTime.UtcNow,
             InstalledDate = DateTime.UtcNow,
         };
@@ -224,13 +231,13 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
             Mileage = 0
 
         });
-         dbContext.TyreLogs.Add(new TyreLog
+        dbContext.TyreLogs.Add(new TyreLog
         {
             Date = DateTime.UtcNow,
             Status = Enum_TyreLog.Installed,
             Tyre = tyreInDb,
-            TyreId =(int) tyreInDb!.Id!, 
-            TruckId =truck.Id,
+            TyreId = (int)tyreInDb!.Id!,
+            TruckId = truck.Id,
             TruckPlateNo = truck.PlatNo,
             Mileage = 0,
         });
@@ -242,21 +249,21 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
     {
         if (tyreInDb.TruckId != null)
         {
-            var truckPlatNo = await dbContext.Trucks.FirstAsync(x=>x.Id==tyreInDb.TruckId);
+            var truckPlatNo = await dbContext.Trucks.FirstAsync(x => x.Id == tyreInDb.TruckId);
             return Results.BadRequest($"Tyre is already installed to another vehicle Plat No{truckPlatNo.PlatNo}");
         }
-        if(truck.Tyres.Any(x=>
-            x.Position.Side==tyre.Position.Side &&
-            x.Position.Direction== tyre.Position.Direction &&
-            x.Position.Index== tyre.Position.Index)
+        if (truck.Tyres.Any(x =>
+            x.Position.Side == tyre.Position.Side &&
+            x.Position.Direction == tyre.Position.Direction &&
+            x.Position.Index == tyre.Position.Index)
         )
             return Results.BadRequest("Truck has a tyre installed to this position, Please remove the tyre first!");
 
 
         tyreInDb.Position = tyre.Position;
         tyreInDb.TruckId = tyre.TruckId;
-        tyreInDb.StartMileage = truck!.CurrentMileage??0;
-        tyreInDb.EndMileage = truck!.CurrentMileage??0;
+        tyreInDb.StartMileage = truck!.CurrentMileage ?? 0;
+        tyreInDb.EndMileage = truck!.CurrentMileage ?? 0;
         tyreInDb.InstalledDate = DateTime.UtcNow;
         dbContext.Tyres.Update(tyreInDb);
         dbContext.SaveChanges();
@@ -279,14 +286,14 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
 
 app.MapPut("/removeTyreFromTruck", async ([FromServices] AppDbContext dbContext, [FromQuery] int tyreId) =>
 {
-    var tyre = await dbContext.Tyres.FirstOrDefaultAsync(x=>x.Id == tyreId);
-    if(tyre.TruckId==null)
+    var tyre = await dbContext.Tyres.FirstOrDefaultAsync(x => x.Id == tyreId);
+    if (tyre.TruckId == null)
     {
         return Results.BadRequest("Tyre is not attached to a truck!");
     }
     var truck = await dbContext.Trucks.FirstAsync(x => x.Id == tyre.TruckId);
     tyre.TruckId = null;
-    tyre.EndMileage = truck.CurrentMileage??0;
+    tyre.EndMileage = truck.CurrentMileage ?? 0;
     dbContext.TyreLogs.Add(new TyreLog
     {
         Date = DateTime.UtcNow,
@@ -295,11 +302,11 @@ app.MapPut("/removeTyreFromTruck", async ([FromServices] AppDbContext dbContext,
         TyreId = (int)tyre!.Id!,
         TruckId = truck.Id,
         TruckPlateNo = truck.PlatNo,
-        Mileage = (tyre.EndMileage ?? 0) - (tyre.StartMileage??0),        
+        Mileage = (tyre.EndMileage ?? 0) - (tyre.StartMileage ?? 0),
     });
     dbContext.Tyres.Update(tyre);
     dbContext.SaveChanges();
-    return Results.Ok();    
+    return Results.Ok();
 
 
 

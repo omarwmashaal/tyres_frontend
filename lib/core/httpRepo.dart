@@ -94,7 +94,10 @@ class HttpClientImpl implements HttpRepo {
     result = await http.get(Uri.parse("http://localhost:5205/$host"), headers: _getHeaders()).catchError((e) {
       return http.Response(e.toString(), 500);
     });
-    if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
+    if (result.statusCode == 401) {
+      authenticationBloc.emit(AuthenticationUnAuthorizedState());
+      return StandardHttpResponse(statusCode: 401, data: "", errorMessage: "UnAuthorized", isSuccess: false);
+    }
 
     return StandardHttpResponse.fromHttpResponse(result);
   }

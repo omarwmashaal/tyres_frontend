@@ -17,6 +17,7 @@ class Authenticationrepoimpl implements Authenticationrepo {
   Future<Either<Failure, NoParams>> login(String email, String password) async {
     try {
       var token = await authenticationDatasource.login(email, password);
+      token = token.replaceAll('"', '');
       await sharedPreferencesDatasource.setValue("token", token);
       return Right(NoParams());
     } on FailureException catch (e) {
