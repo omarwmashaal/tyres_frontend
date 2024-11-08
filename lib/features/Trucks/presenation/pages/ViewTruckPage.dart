@@ -191,6 +191,7 @@ class ViewTruckPage extends StatelessWidget {
   Widget buildTyreLayout(BuildContext context, List<TyreEntity> tyres, TruckEntity truck) {
     return Column(
       children: [
+        TitleText(title: "Front Of The Truck"),
         // First row (single front wheels)
         buildDoubleWheels(
           context,

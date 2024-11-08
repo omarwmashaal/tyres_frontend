@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:tyres_frontend/core/failure.dart';
 import 'package:tyres_frontend/core/httpRepo.dart';
 import 'package:tyres_frontend/core/usecase/usecases.dart';
