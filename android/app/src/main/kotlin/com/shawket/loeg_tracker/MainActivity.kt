@@ -1,4 +1,4 @@
-package com.example.tyres_frontend
+package com.shawket.tyre_tracker
 
 import io.flutter.embedding.android.FlutterActivity
 

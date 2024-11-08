@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as dio;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tyres_frontend/core/Widgets/globalAuthBloc.dart';
 import 'package:tyres_frontend/core/remoteConstats.dart';
 import 'package:tyres_frontend/core/sharedPreferencesDatasource.dart';
