@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tyres_frontend/core/Widgets/globalAuthBloc.dart';
 import 'package:tyres_frontend/core/httpRepo.dart';
 import 'package:tyres_frontend/core/sharedPreferencesDatasource.dart';
@@ -34,7 +35,7 @@ var si = GetIt.instance;
 
 setUpServiceInjectors() async {
   //?core
-  //si.registerSingletonAsync<SharedPreferences>(() async => await SharedPreferences.getInstance());
+  si.registerSingletonAsync<SharedPreferences>(() async => await SharedPreferences.getInstance());
   si.registerLazySingleton(() => Globalauthbloc());
   si.registerLazySingleton<HttpRepo>(() => HttpClientImpl(
         sharedPreferences: si(),
