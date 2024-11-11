@@ -119,6 +119,11 @@ app.Use(async (context, next) =>
     context.Response.Body = originalBodyStream;
 });
 
+app.MapGet("/test", () =>
+{
+    return Results.Ok("Connected");
+});
+
 app.MapGet("/register", async ([FromServices] UserManager<User> userManager, [FromQuery] String email, [FromQuery] String password, [FromQuery] String name) =>
 {
     var userName = name + email;

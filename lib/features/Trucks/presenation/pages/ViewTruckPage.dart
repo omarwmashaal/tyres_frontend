@@ -207,19 +207,28 @@ class ViewTruckPage extends StatelessWidget {
 
         // Second to Seventh rows (double wheels)
         for (int row = 2; row <= 7; row++)
-          Padding(
-            padding: EdgeInsets.only(bottom: 40.h),
-            child: buildDoubleWheels(
-              context,
-              findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Outer),
-              findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Outer),
-              'L${row}O',
-              'R${row}O',
-              truck,
-              leftInner: findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Inner),
-              rightInner: findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Inner),
-              row: row,
-            ),
+          Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 40.h),
+                child: buildDoubleWheels(
+                  context,
+                  findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Outer),
+                  findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Outer),
+                  'L${row}O',
+                  'R${row}O',
+                  truck,
+                  leftInner: findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Inner),
+                  rightInner: findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Inner),
+                  row: row,
+                ),
+              ),
+              if (row == 3)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 40.h),
+                  child: Divider(),
+                ),
+            ],
           ),
       ],
     );
