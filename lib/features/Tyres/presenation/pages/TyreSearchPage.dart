@@ -88,7 +88,7 @@ class TyreSearchPage extends StatelessWidget {
                           ),
                           onTap: () {
                             // Navigate to tyre details or edit page
-                            context.go('/tyre-details/${tyre.id}');
+                            // context.go('/tyre-details/${tyre.id}');
                           },
                         ),
                       );

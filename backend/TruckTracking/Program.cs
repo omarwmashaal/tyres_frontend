@@ -32,7 +32,10 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
-
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000); // Replace 5000 with your desired port
+});
 // Configure CORS
 builder.Services.AddCors(options =>
 {
@@ -69,13 +72,30 @@ builder.Services.AddAuthentication(options =>
 // Configure Database
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql("Host=localhost;port=5432;Database=TyresDb;Username=postgres;Password=admin");
+    options.UseNpgsql("Host=localhost;port=5432;Database=tyresdb;Username=postgres;Password=admin");
 });
+
 
 // Configure Authorization
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<AppDbContext>();
+
+    try
+    {
+        dbContext.Database.Migrate(); // Applies any pending migrations
+    }
+    catch (Exception ex)
+    {
+        // Log the exception or handle errors during migration
+        Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+    }
+}
 
 app.UseCors();
 app.UseAuthentication();
@@ -257,7 +277,7 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
         if (tyreInDb.TruckId != null)
         {
             var truckPlatNo = await dbContext.Trucks.FirstAsync(x => x.Id == tyreInDb.TruckId);
-            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No {truckPlatNo.PlatNo}");
+            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No {truckPlatNo.PlatNo} "+ (tyreInDb.Position?.Side.ToString() ?? "") +(tyre?.Position?.Index.ToString() ?? "") +(tyre?.Position?.Direction.ToString() ?? ""));
         }
         if (truck.Tyres.Any(x =>
             x.Position.Side == tyre.Position.Side &&
@@ -323,14 +343,14 @@ app.MapPut("/removeTyreFromTruck", async ([FromServices] AppDbContext dbContext,
 app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQuery] string serial) =>
 {
     serial = serial.ToLower();
-    var tyres = await dbContext.Tyres.Where(x => x.Serial.ToLower().StartsWith(serial)).ToListAsync();
+    var tyres = await dbContext.Tyres.Include(x=>x.Position).Where(x => x.Serial.ToLower().StartsWith(serial)).ToListAsync();
 
     foreach (var tyre in tyres)
     {
         var historyMileage = dbContext.TyreLogs.Where(x => x.TyreId == tyre.Id).Sum(x => x.Mileage);
         tyre.TotalMileage = historyMileage + ((tyre.EndMileage ?? 0) - (tyre.StartMileage ?? 0));
         var truck = dbContext.Trucks.FirstOrDefault(x => x.Id == tyre.TruckId);
-        tyre.CurrentTruckPlateNo = truck?.PlatNo;
+        tyre.CurrentTruckPlateNo = truck?.PlatNo + " "+ (tyre.Position?.Side.ToString() ?? "") +(tyre?.Position?.Index.ToString() ?? "") +(tyre?.Position?.Direction.ToString() ?? "");
     }
     return Results.Ok(tyres);
 

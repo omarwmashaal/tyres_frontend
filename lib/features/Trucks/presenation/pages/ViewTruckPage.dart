@@ -215,8 +215,8 @@ class ViewTruckPage extends StatelessWidget {
                   context,
                   findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Outer),
                   findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Outer),
-                  'L${row}O',
-                  'R${row}O',
+                  'L${row}',
+                  'R${row}',
                   truck,
                   leftInner: findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Inner),
                   rightInner: findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Inner),
@@ -255,7 +255,7 @@ class ViewTruckPage extends StatelessWidget {
             buildWheel(
               context,
               leftOuter,
-              leftLabel,
+              (row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer) == enum_TyreDirection.Single ? leftLabel : leftLabel + "O",
               TyrePositionEntity(
                 direction: row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer,
                 side: enum_TyreSide.Left,
@@ -267,7 +267,7 @@ class ViewTruckPage extends StatelessWidget {
               buildWheel(
                 context,
                 leftInner,
-                leftLabel,
+                leftLabel + "I",
                 TyrePositionEntity(
                   direction: enum_TyreDirection.Inner,
                   side: enum_TyreSide.Left,
@@ -284,7 +284,7 @@ class ViewTruckPage extends StatelessWidget {
               buildWheel(
                 context,
                 rightInner,
-                rightLabel,
+                rightLabel + "I",
                 TyrePositionEntity(
                   direction: enum_TyreDirection.Inner,
                   side: enum_TyreSide.Right,
@@ -295,7 +295,7 @@ class ViewTruckPage extends StatelessWidget {
             buildWheel(
               context,
               rightOuter,
-              rightLabel,
+              (row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer) == enum_TyreDirection.Single ? rightLabel : rightLabel + "O",
               TyrePositionEntity(
                 direction: row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer,
                 side: enum_TyreSide.Right,
