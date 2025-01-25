@@ -14,6 +14,7 @@ class TyreModel {
   final TyrePositionModel? position;
   final DateTime? installedDate;
   final DateTime? addedDate;
+  final String? currentTruckPlateNo;
 
   // Constructor
   TyreModel({
@@ -27,6 +28,7 @@ class TyreModel {
     this.position,
     this.addedDate,
     this.installedDate,
+    this.currentTruckPlateNo,
   });
 
   /// Factory method to create a `TyreModel` from an entity.
@@ -40,6 +42,7 @@ class TyreModel {
       totalMileage: entity.totalMileage,
       serial: entity.serial,
       model: entity.model,
+      currentTruckPlateNo: entity.currentTruckPlateNo,
       position: entity.position == null ? null : TyrePositionModel.fromEntity(entity.position!),
     );
   }
@@ -57,6 +60,7 @@ class TyreModel {
       model: this.model,
       addedDate: this.addedDate,
       installedDate: this.installedDate,
+      currentTruckPlateNo: this.currentTruckPlateNo,
       position: this.position?.toEntity(),
     );
   }
@@ -71,6 +75,7 @@ class TyreModel {
       totalMileage: json['totalMileage'] as int?,
       serial: json['serial'] as String?,
       model: json['model'] as String?,
+      currentTruckPlateNo: json['currentTruckPlateNo'] as String?,
       addedDate: DateTime.tryParse(json['addedDate'] ?? "")?.toLocal(),
       installedDate: DateTime.tryParse(json['installedDate'] ?? "")?.toLocal(),
       position: json['position'] != null ? TyrePositionModel.fromJson(json['position'] as Map<String, dynamic>) : null,

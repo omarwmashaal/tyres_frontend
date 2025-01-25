@@ -19,6 +19,8 @@ namespace TruckTracking.Models
         public DateTime? InstalledDate { get; set; }
         [NotMapped]
         public int? TotalMileage { get; set; } = 0;
+        [NotMapped]
+        public string? CurrentTruckPlateNo { get; set; } = string.Empty;
     }
     [Owned]
     public class TyrePosition

@@ -11,6 +11,7 @@ class TyreEntity {
   final TyrePositionEntity? position;
   final DateTime? installedDate;
   final DateTime? addedDate;
+  final String? currentTruckPlateNo;
 
   TyreEntity({
     this.id,
@@ -23,5 +24,6 @@ class TyreEntity {
     this.position,
     this.installedDate,
     this.addedDate,
+    this.currentTruckPlateNo,
   });
 }

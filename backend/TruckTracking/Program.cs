@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -255,7 +256,7 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
         if (tyreInDb.TruckId != null)
         {
             var truckPlatNo = await dbContext.Trucks.FirstAsync(x => x.Id == tyreInDb.TruckId);
-            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No{truckPlatNo.PlatNo}");
+            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No {truckPlatNo.PlatNo}");
         }
         if (truck.Tyres.Any(x =>
             x.Position.Side == tyre.Position.Side &&
@@ -313,6 +314,24 @@ app.MapPut("/removeTyreFromTruck", async ([FromServices] AppDbContext dbContext,
     dbContext.SaveChanges();
     return Results.Ok();
 
+
+
+});
+
+
+app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQuery] string serial) =>
+{
+    serial = serial.ToLower();
+    var tyres = await dbContext.Tyres.Where(x => x.Serial.ToLower().StartsWith(serial)).ToListAsync();
+
+    foreach (var tyre in tyres)
+    {
+        var historyMileage = dbContext.TyreLogs.Where(x => x.TyreId == tyre.Id).Sum(x => x.Mileage);
+        tyre.TotalMileage = historyMileage + ((tyre.EndMileage ?? 0) - (tyre.StartMileage ?? 0));
+        var truck = dbContext.Trucks.FirstOrDefault(x => x.Id == tyre.TruckId);
+        tyre.CurrentTruckPlateNo = truck?.PlatNo;
+    }
+    return Results.Ok(tyres);
 
 
 });

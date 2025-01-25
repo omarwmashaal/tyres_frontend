@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:tyres_frontend/core/failure.dart';
 import 'package:tyres_frontend/core/httpRepo.dart';
 import 'package:tyres_frontend/core/usecase/usecases.dart';
@@ -40,24 +42,16 @@ class TyreDatasourceImpl implements TyreDatasource {
 
   @override
   Future<List<TyreModel>> getTyreBySerial(String serial) async {
-    // Mock implementation for getting a tyre by serial
-    return Future.value(
-      [
-        TyreModel(
-          id: 1,
-          truckId: 101,
-          // startMileage: 5000,
-          // endMileage: null,
-          serial: serial,
-          model: "Michelin X Line",
-          position: TyrePositionModel(
-            direction: enum_TyreDirection.Outer,
-            side: enum_TyreSide.Left,
-            index: 1,
-          ),
+    var result = await httpRepo.get(host: "searchTyre?serial=$serial");
+    if (result.statusCode == 200) {
+      return (json.decode(result.data as String) as List<dynamic>).map((e) => TyreModel.fromJson(e as Map<String, dynamic>)).toList();
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
         ),
-      ],
-    );
+      );
   }
 
   @override

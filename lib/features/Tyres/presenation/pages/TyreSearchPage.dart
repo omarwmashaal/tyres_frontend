@@ -74,18 +74,13 @@ class TyreSearchPage extends StatelessWidget {
                                   'Model: ${tyre.model ?? 0}',
                                   style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Tyre Start Mileage: ${tyre.startMileage ?? 0}',
-                                      style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
-                                    ),
-                                    Text(
-                                      'Tyre Current Mileage: ${tyre.endMileage ?? 0}',
-                                      style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
-                                    ),
-                                  ],
+                                Text(
+                                  'Total: ${tyre.totalMileage ?? 0} Km',
+                                  style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
+                                ),
+                                Text(
+                                  'Plat No: ${tyre.currentTruckPlateNo ?? "Not Installed"}',
+                                  style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
                                 ),
                               ],
                             ),

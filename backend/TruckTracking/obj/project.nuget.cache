@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TCeAB6zVdFmlYMJBzO/ECh3ghHx5YqAhAw+rT0AP/lk7iRycHReyKd0+u5OIe+I/JFQI+j5OzMAt7SIEkRaJxQ==",
+  "dgSpecHash": "Seo/jj/jQooWjldNR368qaSXWxvcOgzhIQ+Me/g4hu/xJWSibreok3l5vNBHkRg+kQpCKr2PRF1Lb+f5G6O3Zw==",
   "success": true,
-  "projectFilePath": "D:\\Projects\\Truck Tracking\\tyres_frontend\\backend\\TruckTracking\\TruckTracking.csproj",
+  "projectFilePath": "D:\\Projects\\TyreApp\\tyres_frontend\\backend\\TruckTracking\\TruckTracking.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\owbm9\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\owbm9\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.2.0\\microsoft.aspnetcore.authentication.2.2.0.nupkg.sha512",

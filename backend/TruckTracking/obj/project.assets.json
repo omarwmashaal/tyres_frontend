@@ -2564,11 +2564,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\Truck Tracking\\tyres_frontend\\backend\\TruckTracking\\TruckTracking.csproj",
+      "projectUniqueName": "D:\\Projects\\TyreApp\\tyres_frontend\\backend\\TruckTracking\\TruckTracking.csproj",
       "projectName": "TruckTracking",
-      "projectPath": "D:\\Projects\\Truck Tracking\\tyres_frontend\\backend\\TruckTracking\\TruckTracking.csproj",
+      "projectPath": "D:\\Projects\\TyreApp\\tyres_frontend\\backend\\TruckTracking\\TruckTracking.csproj",
       "packagesPath": "C:\\Users\\owbm9\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\Truck Tracking\\tyres_frontend\\backend\\TruckTracking\\obj\\",
+      "outputPath": "D:\\Projects\\TyreApp\\tyres_frontend\\backend\\TruckTracking\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\owbm9\\AppData\\Roaming\\NuGet\\NuGet.Config",
