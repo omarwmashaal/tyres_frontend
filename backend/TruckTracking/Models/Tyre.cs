@@ -20,7 +20,7 @@ namespace TruckTracking.Models
         [NotMapped]
         public int? TotalMileage { get; set; } = 0;
         [NotMapped]
-        public string? CurrentTruckPlateNo { get; set; } = string.Empty;
+        public string? CurrentTruckPlateNo { get; set; } 
     }
     [Owned]
     public class TyrePosition

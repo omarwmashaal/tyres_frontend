@@ -24,8 +24,16 @@ class TyreDatasourceImpl implements TyreDatasource {
   TyreDatasourceImpl({required this.httpRepo});
   @override
   Future<NoParams> addTyre(TyreModel tyre) async {
-    // Mock implementation for adding a tyre
-    return Future.value(NoParams());
+    var result = await httpRepo.put(host: "addTyre?serial=${tyre.serial}&model=${tyre.model}");
+    if (result.statusCode == 200) {
+      return NoParams();
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
   }
 
   @override

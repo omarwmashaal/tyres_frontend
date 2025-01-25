@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -333,6 +334,36 @@ app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQue
     }
     return Results.Ok(tyres);
 
+
+});
+app.MapPut("/addTyre", async ([FromServices] AppDbContext dbContext, [FromQuery] string serial, [FromQuery] string model) =>
+{
+    var tyre = new Tyre
+    {
+        Model = model,
+        Serial = serial,
+        StartMileage = 0,
+        EndMileage =  0,
+        AddedDate = DateTime.UtcNow,
+        Position = null,
+        TruckId = null,
+        CurrentTruckPlateNo = null,
+        InstalledDate = null,
+        TotalMileage = 0,        
+    };
+    dbContext.Tyres.Add(tyre);
+    dbContext.SaveChanges();
+    dbContext.TyreLogs.Add(new TyreLog
+    {
+        Date = DateTime.UtcNow,
+        Status = Enum_TyreLog.Added,
+        Tyre = tyre,
+        TyreId = (int)tyre!.Id!,
+        Mileage = 0
+
+    });
+    dbContext.SaveChanges();
+    return Results.Ok();
 
 });
 
