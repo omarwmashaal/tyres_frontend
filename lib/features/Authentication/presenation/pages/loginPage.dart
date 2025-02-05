@@ -13,6 +13,7 @@ import 'package:tyres_frontend/features/Authentication/data/models/loginModel.da
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_bloc.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocEvents.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocStates.dart';
+import 'package:tyres_frontend/features/Authentication/presenation/pages/registerPage.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/pages/TruckSearchPage.dart'; // For accessing GetIt instance
 
 class LoginPage extends StatelessWidget {
@@ -72,7 +73,6 @@ class LoginPage extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => Homepagesparent(),
                       ));
-                  //context.go('/trucks');
                 } else if (state is AuthenticationErrorState) {
                   // Show error message if login failed
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +114,11 @@ class LoginPage extends StatelessWidget {
             SecondaryButton(
               text: 'Don’t have an account? Register here',
               onPressed: () {
-                context.go('/register');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RegisterPage(),
+                    ));
               },
             ),
           ],

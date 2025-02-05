@@ -8,6 +8,7 @@ import 'package:tyres_frontend/features/Trucks/domain/entities/truckEntity.dart'
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_bloc.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_blocEvents.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_blocStates.dart';
+import 'package:tyres_frontend/features/Trucks/presenation/pages/ViewTruckPage.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/widgets/addTruckWidget.dart';
 
 class TruckSearchPage extends StatelessWidget {
@@ -75,7 +76,11 @@ class TruckSearchPage extends StatelessWidget {
                             ),
                             onTap: () {
                               // Navigate to truck details or edit page
-                              context.go('/truck-details/${truck.id}');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ViewTruckPage(truckId: truck.id ?? 0),
+                                  ));
                             },
                           ),
                         );
