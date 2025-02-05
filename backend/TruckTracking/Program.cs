@@ -72,7 +72,7 @@ builder.Services.AddAuthentication(options =>
 // Configure Database
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql("Host=localhost;port=5432;Database=tyresdb;Username=postgres;Password=admin");
+    options.UseNpgsql("Host=localhost;port=5432;Database=TyresDb;Username=postgres;Password=admin");
 });
 
 

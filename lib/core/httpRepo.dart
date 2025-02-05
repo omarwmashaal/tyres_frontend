@@ -90,11 +90,12 @@ class HttpClientImpl implements HttpRepo {
   Future<StandardHttpResponse> get({required String host}) async {
     late http.Response result;
 
-    result = await http.get(Uri.parse("http://165.22.31.49:5000/$host"), headers: _getHeaders()).catchError((e) {
+    result = await http.get(Uri.parse("$remoteHost/$host"), headers: _getHeaders()).catchError((e) {
       return http.Response(e.toString(), 500);
     });
     if (result.statusCode == 401) {
       authenticationBloc.emit(AuthenticationUnAuthorizedState());
+      globalauthbloc.emit(AuthenticationUnAuthorizedState());
       return StandardHttpResponse(statusCode: 401, data: "", errorMessage: "UnAuthorized", isSuccess: false);
     }
 
@@ -105,10 +106,11 @@ class HttpClientImpl implements HttpRepo {
   Future<StandardHttpResponse> post({required String host, dynamic? body}) async {
     late http.Response result;
 
-    result = await http.post(Uri.parse("http://165.22.31.49:5000/$host"), headers: _getHeaders(), body: json.encode(body)).catchError((e) {
+    result = await http.post(Uri.parse("$remoteHost/$host"), headers: _getHeaders(), body: json.encode(body)).catchError((e) {
       return http.Response(e.toString(), 500);
     });
     if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
+    if (result.statusCode == 401) globalauthbloc.emit(AuthenticationUnAuthorizedState());
 
     return StandardHttpResponse.fromHttpResponse(result);
   }
@@ -117,10 +119,11 @@ class HttpClientImpl implements HttpRepo {
   Future<StandardHttpResponse> put({required String host, dynamic? body}) async {
     late http.Response result;
 
-    result = await http.put(Uri.parse("http://165.22.31.49:5000/$host"), headers: _getHeaders(), body: json.encode(body)).catchError((e) {
+    result = await http.put(Uri.parse("$remoteHost/$host"), headers: _getHeaders(), body: json.encode(body)).catchError((e) {
       return http.Response(e.toString(), 500);
     });
     if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
+    if (result.statusCode == 401) globalauthbloc.emit(AuthenticationUnAuthorizedState());
 
     return StandardHttpResponse.fromHttpResponse(result);
   }
@@ -129,10 +132,11 @@ class HttpClientImpl implements HttpRepo {
   Future<StandardHttpResponse> delete({required String host, body}) async {
     late http.Response result;
 
-    result = await http.delete(Uri.parse("http://165.22.31.49:5000/$host"), headers: _getHeaders()).catchError((e) {
+    result = await http.delete(Uri.parse("$remoteHost/$host"), headers: _getHeaders()).catchError((e) {
       return http.Response(e.toString(), 500);
     });
     if (result.statusCode == 401) authenticationBloc.emit(AuthenticationUnAuthorizedState());
+    if (result.statusCode == 401) globalauthbloc.emit(AuthenticationUnAuthorizedState());
 
     return StandardHttpResponse.fromHttpResponse(result);
   }

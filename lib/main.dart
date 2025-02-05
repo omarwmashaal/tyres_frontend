@@ -7,8 +7,11 @@ import 'package:tyres_frontend/core/router.dart';
 import 'package:tyres_frontend/core/service_injector.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_bloc.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocStates.dart';
+import 'package:tyres_frontend/features/Authentication/presenation/pages/loginPage.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_bloc.dart';
-import 'package:tyres_frontend/features/Tyres/presenation/blocs/tyres_bloc.dart'; // Your GetIt service injector setup
+import 'package:tyres_frontend/features/Tyres/presenation/blocs/tyres_bloc.dart';
+
+import 'core/remoteConstats.dart'; // Your GetIt service injector setup
 
 void main() async {
   // Ensuring that widgets are bound to the Flutter engine before initializing services.
@@ -26,27 +29,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812), // Default design size (iPhone X dimensions)
-      builder: (context, child) {
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => si<AuthenticationBloc>()),
-            BlocProvider(create: (context) => si<TruckBloc>()),
-            BlocProvider(create: (context) => si<TyreBloc>()),
-            BlocProvider(create: (context) => si<Globalauthbloc>()),
-          ],
-          child: MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            title: 'Tyres App',
-            theme: ThemeData(
-              colorSchemeSeed: Colors.white,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
-            routerConfig: _router, // GoRouter configuration
-          ),
-        );
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => si<AuthenticationBloc>()),
+        BlocProvider(create: (context) => si<TruckBloc>()),
+        BlocProvider(create: (context) => si<TyreBloc>()),
+        BlocProvider(create: (context) => si<Globalauthbloc>()),
+      ],
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        builder: (context, child) {
+          globalauthbloc = BlocProvider.of<Globalauthbloc>(context);
+          return MaterialApp(
+            home: LoginPage(),
+          );
+        },
+      ),
     );
   }
 }

@@ -36,6 +36,7 @@ var si = GetIt.instance;
 setUpServiceInjectors() async {
   //?core
   si.registerSingletonAsync<SharedPreferences>(() async => await SharedPreferences.getInstance());
+  await si.allReady();
   si.registerLazySingleton(() => Globalauthbloc());
   si.registerLazySingleton<HttpRepo>(() => HttpClientImpl(
         sharedPreferences: si(),
