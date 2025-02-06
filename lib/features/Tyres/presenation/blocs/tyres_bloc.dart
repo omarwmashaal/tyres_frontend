@@ -96,8 +96,8 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Install a tyre on a truck
     on<InstallTyreOnTruckEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, NoParams> result =
-          await installTyreToATruckUseCase(event.params);
+      final Either<Failure, NoParams> result = await installTyreToATruckUseCase(
+          InstalltyretoatruckParams(tyre: event.tyre, newTyre: event.newTyre));
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (_) => emit(TyreInstalledOnTruckState()),

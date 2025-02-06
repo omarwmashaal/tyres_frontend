@@ -11,7 +11,7 @@ abstract class TyreDatasource {
   Future<int> getNextId();
   Future<TyreModel> getTyreData(int id);
   Future<List<TyreModel>> getTyresForATruck(int truckId);
-  Future<NoParams> installTyreToATruck(TyreModel tyre);
+  Future<NoParams> installTyreToATruck(TyreModel tyre, bool newTyre);
   Future<NoParams> removeTyreFromATruck(int tyreId);
   Future<NoParams> addTyre(TyreModel tyre);
   Future<NoParams> deleteTyre(int id);
@@ -120,8 +120,9 @@ class TyreDatasourceImpl implements TyreDatasource {
   }
 
   @override
-  Future<NoParams> installTyreToATruck(TyreModel tyre) async {
-    var result = await httpRepo.post(host: "installTyre", body: tyre.toJson());
+  Future<NoParams> installTyreToATruck(TyreModel tyre, bool newTyre) async {
+    var result = await httpRepo.post(
+        host: "installTyre?newTyre=$newTyre", body: tyre.toJson());
     if (result.statusCode == 200) {
       return NoParams();
     } else

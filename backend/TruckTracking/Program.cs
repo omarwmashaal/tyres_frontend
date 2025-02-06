@@ -230,9 +230,10 @@ app.MapPut("/updateTruck", async ([FromServices] AppDbContext dbContext, [FromBo
 
 });
 
-app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromBody] Tyre tyre) =>
+app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromBody] Tyre tyre, [FromQuery] bool newTyre) =>
 {
-    var tyreInDb = await dbContext.Tyres.FirstOrDefaultAsync(x => x.Serial.ToLower() == tyre.Serial.ToLower());
+    
+    var tyreInDb =newTyre? null : await dbContext.Tyres.FirstOrDefaultAsync(x => x.Serial.ToLower().Trim().Replace(" ", "") == tyre.Serial.ToLower().Trim().Replace(" ", ""));
     var truck = await dbContext.Trucks.Include(x => x.Tyres).FirstOrDefaultAsync(x => x.Id == tyre.TruckId);
     if (tyreInDb == null)
     {
@@ -277,7 +278,7 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
         if (tyreInDb.TruckId != null)
         {
             var truckPlatNo = await dbContext.Trucks.FirstAsync(x => x.Id == tyreInDb.TruckId);
-            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No {truckPlatNo.PlatNo} "+ (tyreInDb.Position?.Side.ToString() ?? "") +(tyre?.Position?.Index.ToString() ?? "") +(tyre?.Position?.Direction.ToString() ?? ""));
+            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No {truckPlatNo.PlatNo} "+ (tyreInDb.Position?.Side.ToString() ?? "") +(tyreInDb?.Position?.Index.ToString() ?? "") +(tyreInDb?.Position?.Direction.ToString() ?? ""));
         }
         if (truck.Tyres.Any(x =>
             x.Position.Side == tyre.Position.Side &&
@@ -343,8 +344,8 @@ app.MapPut("/removeTyreFromTruck", async ([FromServices] AppDbContext dbContext,
 
 app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQuery] string serial) =>
 {
-    serial = serial.ToLower();
-    var tyres = await dbContext.Tyres.Include(x=>x.Position).Where(x => x.Serial.ToLower().StartsWith(serial)).ToListAsync();
+    serial = serial.ToLower().Trim().Replace(" ","");
+    var tyres = await dbContext.Tyres.Include(x=>x.Position).Where(x => x.Serial.ToLower().Trim().Replace(" ", "").StartsWith(serial)).ToListAsync();
 
     foreach (var tyre in tyres)
     {
@@ -354,6 +355,15 @@ app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQue
         tyre.CurrentTruckPlateNo = truck ==null? "Not Installed!" : truck?.PlatNo + " "+ (tyre.Position?.Side.ToString() ?? "") +(tyre?.Position?.Index.ToString() ?? "") +(tyre?.Position?.Direction.ToString() ?? "");
     }
     return Results.Ok(tyres);
+
+
+});
+
+app.MapGet("/getNewId", async ([FromServices] AppDbContext dbContext) =>
+{
+    int nextId = (dbContext.Tyres.Max(t => (int?)t.Id) ?? 0) + 1;
+    
+    return Results.Ok(nextId);
 
 
 });

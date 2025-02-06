@@ -8,7 +8,8 @@ abstract class TyresRepo {
   Future<Either<Failure, int>> getNextId();
   Future<Either<Failure, TyreEntity>> getTyreData(int id);
   Future<Either<Failure, List<TyreEntity>>> getTyresForATruck(int truckId);
-  Future<Either<Failure, NoParams>> installTyreToATruck(TyreEntity tyre);
+  Future<Either<Failure, NoParams>> installTyreToATruck(
+      TyreEntity tyre, bool newTyre);
   Future<Either<Failure, NoParams>> removeTyreFromATruck(int tyreId);
   Future<Either<Failure, NoParams>> addTyre(TyreEntity tyre);
   Future<Either<Failure, NoParams>> deleteTyre(int id);

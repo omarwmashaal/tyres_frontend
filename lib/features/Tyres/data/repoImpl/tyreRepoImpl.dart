@@ -41,10 +41,11 @@ class TyresRepoImpl implements TyresRepo {
   }
 
   @override
-  Future<Either<Failure, NoParams>> installTyreToATruck(TyreEntity tyre) async {
+  Future<Either<Failure, NoParams>> installTyreToATruck(
+      TyreEntity tyre, bool newTyre) async {
     try {
       var tyreModel = TyreModel.fromEntity(tyre);
-      await tyreDatasource.installTyreToATruck(tyreModel);
+      await tyreDatasource.installTyreToATruck(tyreModel, newTyre);
       return Right(NoParams());
     } on FailureException catch (error) {
       return Left(error.failure!);
