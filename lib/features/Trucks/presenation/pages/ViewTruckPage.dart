@@ -45,10 +45,29 @@ class ViewTruckPage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message)),
               );
-            else if (state is TyreInstalledOnTruckState ||
-                state is TyreRemovedFromTruckState ||
-                state is TyrePositionChangedState)
+            else if (state is TyreInstalledOnTruckState || state is TyreRemovedFromTruckState || state is TyrePositionChangedState)
               truckBloc.add(GetTruckEvent(truckId: truckId));
+
+            if (state is TyreInstalledOnTruckState) {
+              if (state.serial.isNotEmpty)
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('New Tyre Added'),
+                      content: Text("New Serial Number: ${state.serial}"),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Okay'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+            }
           },
         ),
         BlocListener<TruckBloc, TruckState>(
@@ -63,8 +82,7 @@ class ViewTruckPage extends StatelessWidget {
                 SnackBar(content: Text(state.message)),
               );
 
-            if (state is TruckUpdatedState || state is TruckUpdateErrorState)
-              truckBloc.add(GetTruckEvent(truckId: truckId));
+            if (state is TruckUpdatedState || state is TruckUpdateErrorState) truckBloc.add(GetTruckEvent(truckId: truckId));
           },
         ),
       ],
@@ -79,8 +97,7 @@ class ViewTruckPage extends StatelessWidget {
         body: Padding(
           padding: EdgeInsets.all(16.w), // Responsive padding
           child: BlocBuilder<TruckBloc, TruckState>(
-            buildWhen: (previous, current) =>
-                current is TruckLoadingState || current is TruckLoadedState,
+            buildWhen: (previous, current) => current is TruckLoadingState || current is TruckLoadedState,
             builder: (context, state) {
               if (state is TruckLoadingState) {
                 return Center(child: CircularProgressIndicator());
@@ -93,9 +110,7 @@ class ViewTruckPage extends StatelessWidget {
                     ListTile(
                       title: Text(
                         'Plate Number',
-                        style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold), // Responsive text
+                        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold), // Responsive text
                       ),
                       subtitle: Text(
                         truck.platNo ?? "N/A",
@@ -108,51 +123,41 @@ class ViewTruckPage extends StatelessWidget {
                     ListTile(
                       title: Text(
                         'Current Mileage',
-                        style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold), // Responsive text
+                        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold), // Responsive text
                       ),
                       subtitle: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             '${truck.currentMileage ?? 0} km',
-                            style:
-                                TextStyle(fontSize: 14.sp), // Responsive text
+                            style: TextStyle(fontSize: 14.sp), // Responsive text
                           ),
                           Expanded(child: SizedBox()),
                           ElevatedButton.icon(
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
-                                isScrollControlled:
-                                    true, // Ensures the modal is full-height
+                                isScrollControlled: true, // Ensures the modal is full-height
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(20.r)),
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
                                 ),
                                 builder: (BuildContext context) {
                                   return Padding(
                                     padding: EdgeInsets.only(
-                                      bottom: MediaQuery.of(context)
-                                          .viewInsets
-                                          .bottom, // Adjust for keyboard
+                                      bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard
                                       top: 16.h,
                                       left: 16.w,
                                       right: 16.w,
                                     ),
-                                    child: EditTruckForm(
-                                        truck: truck, truckBloc: truckBloc),
+                                    child: EditTruckForm(truck: truck, truckBloc: truckBloc),
                                   );
                                 },
                               );
                             },
-                            icon: Icon(Icons.edit,
-                                size: 20.sp), // Responsive icon size
+                            icon: Icon(Icons.edit, size: 20.sp), // Responsive icon size
                             label: Text(
                               'Update Mileage',
-                              style:
-                                  TextStyle(fontSize: 16.sp), // Responsive text
+                              style: TextStyle(fontSize: 16.sp), // Responsive text
                             ),
                           ),
                         ],
@@ -163,15 +168,10 @@ class ViewTruckPage extends StatelessWidget {
                     ListTile(
                       title: Text(
                         'Last Updated Mileage Date',
-                        style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold), // Responsive text
+                        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold), // Responsive text
                       ),
                       subtitle: Text(
-                        truck.lastUpdatedMileageDate == null
-                            ? "N/A"
-                            : DateFormat("dd/MM/yyyy")
-                                .format(truck.lastUpdatedMileageDate!),
+                        truck.lastUpdatedMileageDate == null ? "N/A" : DateFormat("dd/MM/yyyy").format(truck.lastUpdatedMileageDate!),
                         style: TextStyle(fontSize: 14.sp), // Responsive text
                       ),
                     ),
@@ -182,16 +182,14 @@ class ViewTruckPage extends StatelessWidget {
                       padding: EdgeInsets.only(top: 16.h),
                       child: Text(
                         'Tyre Layout',
-                        style: TextStyle(
-                            fontSize: 18.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
 
                     SizedBox(height: 16.h), // Spacing
 
                     // Build the tyre layout based on the TyreEntity list
-                    buildTyreLayout(
-                        context, truck.tyres ?? [], truck, false, null),
+                    buildTyreLayout(context, truck.tyres ?? [], truck, false, null),
 
                     Divider(),
 
@@ -215,22 +213,14 @@ class ViewTruckPage extends StatelessWidget {
   }
 
   // Builds the tyre layout based on the tyre positions
-  Widget buildTyreLayout(BuildContext context, List<TyreEntity> tyres,
-      TruckEntity truck, bool changePosition, int? changedTyreId) {
+  Widget buildTyreLayout(BuildContext context, List<TyreEntity> tyres, TruckEntity truck, bool changePosition, int? changedTyreId) {
     return Column(
       children: [
         TitleText(title: "Front Of The Truck"),
         // First row (single front wheels)
-        buildDoubleWheels(
-            context,
-            findTyre(tyres, enum_TyreSide.Left, 1, enum_TyreDirection.Single),
-            findTyre(tyres, enum_TyreSide.Right, 1, enum_TyreDirection.Single),
-            'Front Left',
-            'Front Right',
-            truck,
-            row: 1,
-            changePosition: changePosition,
-            changedTyreId: changedTyreId),
+        buildDoubleWheels(context, findTyre(tyres, enum_TyreSide.Left, 1, enum_TyreDirection.Single),
+            findTyre(tyres, enum_TyreSide.Right, 1, enum_TyreDirection.Single), 'Front Left', 'Front Right', truck,
+            row: 1, changePosition: changePosition, changedTyreId: changedTyreId),
 
         SizedBox(height: 40.h), // Spacing between rows
 
@@ -240,19 +230,10 @@ class ViewTruckPage extends StatelessWidget {
             children: [
               Padding(
                 padding: EdgeInsets.only(bottom: 40.h),
-                child: buildDoubleWheels(
-                    context,
-                    findTyre(tyres, enum_TyreSide.Left, row,
-                        enum_TyreDirection.Outer),
-                    findTyre(tyres, enum_TyreSide.Right, row,
-                        enum_TyreDirection.Outer),
-                    'L${row}',
-                    'R${row}',
-                    truck,
-                    leftInner: findTyre(tyres, enum_TyreSide.Left, row,
-                        enum_TyreDirection.Inner),
-                    rightInner: findTyre(tyres, enum_TyreSide.Right, row,
-                        enum_TyreDirection.Inner),
+                child: buildDoubleWheels(context, findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Outer),
+                    findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Outer), 'L${row}', 'R${row}', truck,
+                    leftInner: findTyre(tyres, enum_TyreSide.Left, row, enum_TyreDirection.Inner),
+                    rightInner: findTyre(tyres, enum_TyreSide.Right, row, enum_TyreDirection.Inner),
                     row: row,
                     changePosition: changePosition,
                     changedTyreId: changedTyreId),
@@ -291,16 +272,9 @@ class ViewTruckPage extends StatelessWidget {
             buildWheel(
                 context,
                 leftOuter,
-                (row == 1
-                            ? enum_TyreDirection.Single
-                            : enum_TyreDirection.Outer) ==
-                        enum_TyreDirection.Single
-                    ? leftLabel
-                    : leftLabel + "O",
+                (row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer) == enum_TyreDirection.Single ? leftLabel : leftLabel + "O",
                 TyrePositionEntity(
-                  direction: row == 1
-                      ? enum_TyreDirection.Single
-                      : enum_TyreDirection.Outer,
+                  direction: row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer,
                   side: enum_TyreSide.Left,
                   index: row,
                 ),
@@ -341,16 +315,9 @@ class ViewTruckPage extends StatelessWidget {
             buildWheel(
               context,
               rightOuter,
-              (row == 1
-                          ? enum_TyreDirection.Single
-                          : enum_TyreDirection.Outer) ==
-                      enum_TyreDirection.Single
-                  ? rightLabel
-                  : rightLabel + "O",
+              (row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer) == enum_TyreDirection.Single ? rightLabel : rightLabel + "O",
               TyrePositionEntity(
-                direction: row == 1
-                    ? enum_TyreDirection.Single
-                    : enum_TyreDirection.Outer,
+                direction: row == 1 ? enum_TyreDirection.Single : enum_TyreDirection.Outer,
                 side: enum_TyreSide.Right,
                 index: row,
               ),
@@ -366,13 +333,7 @@ class ViewTruckPage extends StatelessWidget {
 
   // Builds a single wheel widget
   Widget buildWheel(
-      BuildContext context,
-      TyreEntity? tyre,
-      String label,
-      TyrePositionEntity position,
-      TruckEntity truck,
-      bool changePostion,
-      int? changedTyreId) {
+      BuildContext context, TyreEntity? tyre, String label, TyrePositionEntity position, TruckEntity truck, bool changePostion, int? changedTyreId) {
     if (tyre != null) {
       return GestureDetector(
         onTap: () {
@@ -421,8 +382,7 @@ class ViewTruckPage extends StatelessWidget {
                       onPressed: () {
                         tyreBloc.add(
                           ChangeTyrePositionEvent(
-                            params: ChangeTyrePositionParams(
-                                tyreId: changedTyreId!, newPosition: position),
+                            params: ChangeTyrePositionParams(tyreId: changedTyreId!, newPosition: position),
                           ),
                         );
                         Navigator.of(context).pop();
@@ -449,13 +409,9 @@ class ViewTruckPage extends StatelessWidget {
   }
 
   // Finds a tyre based on its position
-  TyreEntity? findTyre(List<TyreEntity> tyres, enum_TyreSide side, int row,
-      enum_TyreDirection direction) {
+  TyreEntity? findTyre(List<TyreEntity> tyres, enum_TyreSide side, int row, enum_TyreDirection direction) {
     return tyres.firstWhereOrNull(
-      (tyre) =>
-          tyre.position!.side == side &&
-          tyre.position!.index == row &&
-          tyre.position!.direction == direction,
+      (tyre) => tyre.position!.side == side && tyre.position!.index == row && tyre.position!.direction == direction,
     );
   }
 
@@ -483,8 +439,7 @@ class ViewTruckPage extends StatelessWidget {
               },
             ),
             TextButton(
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.red)),
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
               child: Text(
                 'Uninstall Tyre From Truck',
                 style: TextStyle(color: Colors.white),
@@ -494,10 +449,8 @@ class ViewTruckPage extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text(
-                          'Are you sure you want to uninstall tyre form the truck?'),
-                      content:
-                          Text('Make sure to update truck Mileage is updated!'),
+                      title: Text('Are you sure you want to uninstall tyre form the truck?'),
+                      content: Text('Make sure to update truck Mileage is updated!'),
                       actions: <Widget>[
                         TextButton(
                           child: Text('No'),
@@ -508,8 +461,7 @@ class ViewTruckPage extends StatelessWidget {
                         TextButton(
                           child: Text('Yes'),
                           onPressed: () {
-                            tyreBloc.add(
-                                RemoveTyreFromTruckEvent(tyreId: tyre.id!));
+                            tyreBloc.add(RemoveTyreFromTruckEvent(tyreId: tyre.id!));
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
                           },
@@ -526,8 +478,7 @@ class ViewTruckPage extends StatelessWidget {
     );
   }
 
-  void installTyre(
-      BuildContext context, TyrePositionEntity position, TruckEntity truck) {
+  void installTyre(BuildContext context, TyrePositionEntity position, TruckEntity truck) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -537,8 +488,7 @@ class ViewTruckPage extends StatelessWidget {
       builder: (BuildContext context) {
         return Padding(
           padding: EdgeInsets.only(
-            bottom:
-                MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard
+            bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard
             top: 16.h,
             left: 16.w,
             right: 16.w,
@@ -553,8 +503,7 @@ class ViewTruckPage extends StatelessWidget {
     );
   }
 
-  void changeTyrePositionForm(
-      BuildContext context, TyreEntity tyre, TruckEntity truck) {
+  void changeTyrePositionForm(BuildContext context, TyreEntity tyre, TruckEntity truck) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -563,8 +512,7 @@ class ViewTruckPage extends StatelessWidget {
           content: SizedBox(
             width: 10000,
             child: SingleChildScrollView(
-              child: buildTyreLayout(
-                  context, truck.tyres ?? [], truck, true, tyre.id),
+              child: buildTyreLayout(context, truck.tyres ?? [], truck, true, tyre.id),
             ),
           ),
           actions: <Widget>[

@@ -15,7 +15,11 @@ class TyreInitialState extends TyreState {}
 class TyreLoadingState extends TyreState {}
 
 // State when a tyre is successfully added
-class TyreAddedState extends TyreState {}
+class TyreAddedState extends TyreState {
+  final String serial;
+
+  TyreAddedState({required this.serial});
+}
 
 // State when a tyre's position is successfully changed
 class TyrePositionChangedState extends TyreState {}
@@ -61,7 +65,11 @@ class TyresForTruckLoadedState extends TyreState {
 }
 
 // State when a tyre is successfully installed on a truck
-class TyreInstalledOnTruckState extends TyreState {}
+class TyreInstalledOnTruckState extends TyreState {
+  final String serial;
+
+  TyreInstalledOnTruckState({required this.serial});
+}
 
 // State when a tyre is successfully removed from a truck
 class TyreRemovedFromTruckState extends TyreState {}

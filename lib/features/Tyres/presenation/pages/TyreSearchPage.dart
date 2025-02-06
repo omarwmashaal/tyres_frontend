@@ -112,7 +112,29 @@ class TyreSearchPage extends StatelessWidget {
                 ),
               );
             },
-            listener: (context, state) => {if (state is TyreAddedState) tyreBloc.add(GetTyreBySerialEvent(serial: ""))},
+            listener: (context, state) {
+              if (state is TyreAddedState) {
+                tyreBloc.add(GetTyreBySerialEvent(serial: ""));
+                if (state.serial.isNotEmpty)
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('New Tyre Added'),
+                        content: Text("New Serial Number: ${state.serial}"),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text('Okay'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+              }
+            },
           )),
         ],
       ),

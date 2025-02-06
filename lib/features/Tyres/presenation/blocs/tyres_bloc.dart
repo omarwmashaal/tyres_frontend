@@ -42,18 +42,17 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Add a new tyre
     on<AddTyreEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, NoParams> result = await addTyreUseCase(event.tyre);
+      final Either<Failure, String> result = await addTyreUseCase(event.tyre);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
-        (_) => emit(TyreAddedState()),
+        (serial) => emit(TyreAddedState(serial: serial)),
       );
     });
 
     // Change a tyre's position
     on<ChangeTyrePositionEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, NoParams> result =
-          await changeTyrePositionUseCase(event.params);
+      final Either<Failure, NoParams> result = await changeTyrePositionUseCase(event.params);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (_) => emit(TyrePositionChangedState()),
@@ -63,8 +62,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Get tyre data by ID
     on<GetTyreDataEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, TyreEntity> result =
-          await getTyreDataUseCase(event.tyreId);
+      final Either<Failure, TyreEntity> result = await getTyreDataUseCase(event.tyreId);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (tyre) => emit(TyreLoadedState(tyre: tyre)),
@@ -74,8 +72,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Delete a tyre by ID
     on<DeleteTyreEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, NoParams> result =
-          await deleteTyreUseCase(event.tyreId);
+      final Either<Failure, NoParams> result = await deleteTyreUseCase(event.tyreId);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (_) => emit(TyreDeletedState(tyreId: event.tyreId)),
@@ -85,8 +82,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Get all tyres for a specific truck
     on<GetTyresForATruckEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, List<TyreEntity>> result =
-          await getTyresForATruckUseCase(event.truckId);
+      final Either<Failure, List<TyreEntity>> result = await getTyresForATruckUseCase(event.truckId);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (tyres) => emit(TyresForTruckLoadedState(tyres: tyres)),
@@ -96,19 +92,17 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Install a tyre on a truck
     on<InstallTyreOnTruckEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, NoParams> result = await installTyreToATruckUseCase(
-          InstalltyretoatruckParams(tyre: event.tyre, newTyre: event.newTyre));
+      final Either<Failure, String> result = await installTyreToATruckUseCase(InstalltyretoatruckParams(tyre: event.tyre, newTyre: event.newTyre));
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
-        (_) => emit(TyreInstalledOnTruckState()),
+        (serial) => emit(TyreInstalledOnTruckState(serial: serial)),
       );
     });
 
     // Remove a tyre from a truck
     on<RemoveTyreFromTruckEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, NoParams> result =
-          await removeTyreFromATruckUseCase(event.tyreId);
+      final Either<Failure, NoParams> result = await removeTyreFromATruckUseCase(event.tyreId);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (_) => emit(TyreRemovedFromTruckState()),
@@ -118,8 +112,7 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Get a tyre by serial number
     on<GetTyreBySerialEvent>((event, emit) async {
       emit(TyreLoadingState());
-      final Either<Failure, List<TyreEntity>> result =
-          await getTyreBySerialUseCase(event.serial);
+      final Either<Failure, List<TyreEntity>> result = await getTyreBySerialUseCase(event.serial);
       result.fold(
         (failure) => emit(TyreErrorState(message: failure.message)),
         (tyre) => emit(TyresLoadedState(tyres: tyre)),
@@ -129,11 +122,9 @@ class TyreBloc extends Bloc<TyreEvent, TyreState> {
     // Get next tyre Id
     on<GetNextTyreIdEvent>((event, emit) async {
       emit(LoadingNextTyreIdState());
-      final Either<Failure, int> result =
-          await getNextTyreIdUseCase(NoParams());
+      final Either<Failure, int> result = await getNextTyreIdUseCase(NoParams());
       result.fold(
-        (failure) =>
-            emit(LoadingNextTyreIdErrorState(message: failure.message)),
+        (failure) => emit(LoadingNextTyreIdErrorState(message: failure.message)),
         (nextId) => emit(LoadedNextTyreIdState(nextId: nextId)),
       );
     });

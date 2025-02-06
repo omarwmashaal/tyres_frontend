@@ -27,13 +27,10 @@ class TyresRepoImpl implements TyresRepo {
   }
 
   @override
-  Future<Either<Failure, List<TyreEntity>>> getTyresForATruck(
-      int truckId) async {
+  Future<Either<Failure, List<TyreEntity>>> getTyresForATruck(int truckId) async {
     try {
       final tyreModels = await tyreDatasource.getTyresForATruck(truckId);
-      final tyreEntities = tyreModels
-          .map((model) => model.toEntity())
-          .toList(); // Convert Models to Entities
+      final tyreEntities = tyreModels.map((model) => model.toEntity()).toList(); // Convert Models to Entities
       return Right(tyreEntities);
     } on FailureException catch (error) {
       return Left(error.failure!);
@@ -41,12 +38,11 @@ class TyresRepoImpl implements TyresRepo {
   }
 
   @override
-  Future<Either<Failure, NoParams>> installTyreToATruck(
-      TyreEntity tyre, bool newTyre) async {
+  Future<Either<Failure, String>> installTyreToATruck(TyreEntity tyre, bool newTyre) async {
     try {
       var tyreModel = TyreModel.fromEntity(tyre);
-      await tyreDatasource.installTyreToATruck(tyreModel, newTyre);
-      return Right(NoParams());
+      final result = await tyreDatasource.installTyreToATruck(tyreModel, newTyre);
+      return Right(result);
     } on FailureException catch (error) {
       return Left(error.failure!);
     }
@@ -63,11 +59,11 @@ class TyresRepoImpl implements TyresRepo {
   }
 
   @override
-  Future<Either<Failure, NoParams>> addTyre(TyreEntity tyre) async {
+  Future<Either<Failure, String>> addTyre(TyreEntity tyre) async {
     try {
       final tyreModel = TyreModel.fromEntity(tyre); // Convert Entity to Model
-      await tyreDatasource.addTyre(tyreModel);
-      return Right(NoParams());
+      final result = await tyreDatasource.addTyre(tyreModel);
+      return Right(result);
     } on FailureException catch (error) {
       return Left(error.failure!);
     }
@@ -84,13 +80,10 @@ class TyresRepoImpl implements TyresRepo {
   }
 
   @override
-  Future<Either<Failure, List<TyreEntity>>> getTyreBySerial(
-      String serial) async {
+  Future<Either<Failure, List<TyreEntity>>> getTyreBySerial(String serial) async {
     try {
       final tyresModel = await tyreDatasource.getTyreBySerial(serial);
-      final tyres = tyresModel
-          .map((e) => e.toEntity())
-          .toList(); // Convert Model to Entity
+      final tyres = tyresModel.map((e) => e.toEntity()).toList(); // Convert Model to Entity
       return Right(tyres);
     } on FailureException catch (error) {
       return Left(error.failure!);
@@ -98,11 +91,9 @@ class TyresRepoImpl implements TyresRepo {
   }
 
   @override
-  Future<Either<Failure, NoParams>> changeTyrePosition(
-      int truckId, TyrePositionEntity newPosition) async {
+  Future<Either<Failure, NoParams>> changeTyrePosition(int truckId, TyrePositionEntity newPosition) async {
     try {
-      final positionModel =
-          TyrePositionModel.fromEntity(newPosition); // Convert Entity to Model
+      final positionModel = TyrePositionModel.fromEntity(newPosition); // Convert Entity to Model
       await tyreDatasource.changeTyrePosition(truckId, positionModel);
       return Right(NoParams());
     } on FailureException catch (error) {

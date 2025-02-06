@@ -4,13 +4,13 @@ import 'package:tyres_frontend/core/usecase/usecases.dart';
 import 'package:tyres_frontend/features/Tyres/domain/entities/tyreEntity.dart';
 import 'package:tyres_frontend/features/Tyres/domain/repo/tyresRepo.dart';
 
-class AddTyreUseCase extends UseCase<NoParams, TyreEntity> {
+class AddTyreUseCase extends UseCase<String, TyreEntity> {
   final TyresRepo tyresRepo;
 
   AddTyreUseCase({required this.tyresRepo});
 
   @override
-  Future<Either<Failure, NoParams>> call(TyreEntity tyre) async {
+  Future<Either<Failure, String>> call(TyreEntity tyre) async {
     if (tyre.serial?.isEmpty ?? true) {
       return Left(Failure_HttpBadRequest(message: "Serial cannot be empty"));
     }

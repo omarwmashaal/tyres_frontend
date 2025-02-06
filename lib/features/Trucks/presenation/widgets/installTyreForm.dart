@@ -34,10 +34,7 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
   final TextEditingController startMileageController = TextEditingController();
   final TextEditingController modelController = TextEditingController();
 
-  RxString dtoNumber = "".obs;
   bool newTyre = false;
-  int nextId = 0;
-  String finalNewSerialNumber = "";
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +42,7 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
     return Column(
       mainAxisSize: MainAxisSize.min, // Ensures the modal adjusts dynamically
       children: [
-        TitleText(
-            title: "Install Tyre to Truck\n PlatNo ${widget.truck.platNo}"),
+        TitleText(title: "Install Tyre to Truck\n PlatNo ${widget.truck.platNo}"),
         SizedBox(height: 16.h), // Responsive spacing
 
         SizedBox(
@@ -56,9 +52,7 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
               ListTile(
                 title: Text(
                   'Row',
-                  style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold), // Responsive text
+                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold), // Responsive text
                 ),
                 subtitle: Text(
                   (widget.position?.index ?? 0).toString(),
@@ -71,9 +65,7 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
               ListTile(
                 title: Text(
                   'Side',
-                  style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold), // Responsive text
+                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold), // Responsive text
                 ),
                 subtitle: Text(
                   widget.position.side.name,
@@ -86,9 +78,7 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
               ListTile(
                 title: Text(
                   'Direction',
-                  style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold), // Responsive text
+                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold), // Responsive text
                 ),
                 subtitle: Text(
                   widget.position.direction.name,
@@ -106,11 +96,6 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
               value: newTyre,
               onChanged: (value) => setState(() {
                 newTyre = value ?? false;
-                if (newTyre) {
-                  dtoNumber.value = serialNoController.text;
-                } else {
-                  serialNoController.text = dtoNumber.value;
-                }
               }),
               tristate: false,
             ),
@@ -119,50 +104,10 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
         ),
         SizedBox(height: 16.h), // Responsive spacing
 
-        newTyre
-            ? BlocBuilder<TyreBloc, TyreState>(
-                buildWhen: (previous, current) =>
-                    current is LoadingNextTyreIdState ||
-                    current is LoadingNextTyreIdErrorState ||
-                    current is LoadedNextTyreIdState,
-                builder: (context, state) {
-                  if (state is LoadingNextTyreIdState) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (state is LoadingNextTyreIdErrorState) {
-                    return Center(child: Text("Error loading next tyre id"));
-                  } else if (state is LoadedNextTyreIdState) {
-                    nextId = state.nextId;
-                    return Row(
-                      children: [
-                        // Tyre Mileage Field
-                        Expanded(
-                          child: CustomTextFormField(
-                            controller: serialNoController,
-                            labelText: 'DTO',
-                            onChanged: (p0) => dtoNumber.value = p0,
-                            // Assume mileage is entered as a string and then parsed to an integer
-                          ),
-                        ),
-                        Expanded(
-                          child: Obx(
-                            () {
-                              finalNewSerialNumber =
-                                  dtoNumber + " - " + nextId.toString();
-                              return Text(
-                                  "Serial Number: ${dtoNumber.value + " - " + nextId.toString()}");
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                  return Container();
-                },
-              )
-            : CustomTextFormField(
-                controller: serialNoController,
-                labelText: 'Serial Number',
-              ),
+        CustomTextFormField(
+          controller: serialNoController,
+          labelText: 'Serial Number',
+        ),
 
         SizedBox(height: 16.h), // Responsive spacing
 
@@ -174,12 +119,10 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
 
         ElevatedButton(
           onPressed: () {
-            var serial =
-                newTyre ? finalNewSerialNumber : serialNoController.text;
             widget.tyreBloc.add(
               InstallTyreOnTruckEvent(
                 tyre: TyreEntity(
-                  serial: serial,
+                  serial: serialNoController.text,
                   model: modelController.text,
                   position: widget.position,
                   truckId: widget.truck.id,
@@ -191,8 +134,7 @@ class _InstallTyreFormState extends State<InstallTyreForm> {
             // Close the modal after submission
             Navigator.pop(context);
           },
-          child: Text('Install Tyre',
-              style: TextStyle(fontSize: 16.sp)), // Responsive text size
+          child: Text('Install Tyre', style: TextStyle(fontSize: 16.sp)), // Responsive text size
         ),
       ],
     );

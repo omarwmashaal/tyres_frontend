@@ -11,13 +11,12 @@ abstract class TyreDatasource {
   Future<int> getNextId();
   Future<TyreModel> getTyreData(int id);
   Future<List<TyreModel>> getTyresForATruck(int truckId);
-  Future<NoParams> installTyreToATruck(TyreModel tyre, bool newTyre);
+  Future<String> installTyreToATruck(TyreModel tyre, bool newTyre);
   Future<NoParams> removeTyreFromATruck(int tyreId);
-  Future<NoParams> addTyre(TyreModel tyre);
+  Future<String> addTyre(TyreModel tyre);
   Future<NoParams> deleteTyre(int id);
   Future<List<TyreModel>> getTyreBySerial(String serial);
-  Future<NoParams> changeTyrePosition(
-      int tyreId, TyrePositionModel newPosition);
+  Future<NoParams> changeTyrePosition(int tyreId, TyrePositionModel newPosition);
 }
 
 class TyreDatasourceImpl implements TyreDatasource {
@@ -25,11 +24,10 @@ class TyreDatasourceImpl implements TyreDatasource {
 
   TyreDatasourceImpl({required this.httpRepo});
   @override
-  Future<NoParams> addTyre(TyreModel tyre) async {
-    var result = await httpRepo.put(
-        host: "addTyre?serial=${tyre.serial}&model=${tyre.model}");
+  Future<String> addTyre(TyreModel tyre) async {
+    var result = await httpRepo.put(host: "addTyre?serial=${tyre.serial}&model=${tyre.model}");
     if (result.statusCode == 200) {
-      return NoParams();
+      return (result.data ?? "") as String;
     } else
       throw FailureException(
         failure: FailureFactory.createFailure(
@@ -40,11 +38,8 @@ class TyreDatasourceImpl implements TyreDatasource {
   }
 
   @override
-  Future<NoParams> changeTyrePosition(
-      int tyreId, TyrePositionModel newPosition) async {
-    var result = await httpRepo.put(
-        host: "transfereTyreOnSameTruck?tyreId=$tyreId",
-        body: newPosition.toJson());
+  Future<NoParams> changeTyrePosition(int tyreId, TyrePositionModel newPosition) async {
+    var result = await httpRepo.put(host: "transfereTyreOnSameTruck?tyreId=$tyreId", body: newPosition.toJson());
     if (result.statusCode == 200) {
       return NoParams();
     } else
@@ -66,9 +61,7 @@ class TyreDatasourceImpl implements TyreDatasource {
   Future<List<TyreModel>> getTyreBySerial(String serial) async {
     var result = await httpRepo.get(host: "searchTyre?serial=$serial");
     if (result.statusCode == 200) {
-      return (json.decode(result.data as String) as List<dynamic>)
-          .map((e) => TyreModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+      return (json.decode(result.data as String) as List<dynamic>).map((e) => TyreModel.fromJson(e as Map<String, dynamic>)).toList();
     } else
       throw FailureException(
         failure: FailureFactory.createFailure(
@@ -130,11 +123,10 @@ class TyreDatasourceImpl implements TyreDatasource {
   }
 
   @override
-  Future<NoParams> installTyreToATruck(TyreModel tyre, bool newTyre) async {
-    var result = await httpRepo.post(
-        host: "installTyre?newTyre=$newTyre", body: tyre.toJson());
+  Future<String> installTyreToATruck(TyreModel tyre, bool newTyre) async {
+    var result = await httpRepo.post(host: "installTyre?newTyre=$newTyre", body: tyre.toJson());
     if (result.statusCode == 200) {
-      return NoParams();
+      return (result.data ?? "") as String;
     } else
       throw FailureException(
         failure: FailureFactory.createFailure(

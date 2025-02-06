@@ -5,22 +5,18 @@ import 'package:tyres_frontend/features/Tyres/domain/entities/tyreEntity.dart';
 import 'package:tyres_frontend/features/Tyres/domain/entities/tyrePositionEntity.dart';
 import 'package:tyres_frontend/features/Tyres/domain/repo/tyresRepo.dart';
 
-class InstallTyreToATruckUseCase
-    extends UseCase<NoParams, InstalltyretoatruckParams> {
+class InstallTyreToATruckUseCase extends UseCase<String, InstalltyretoatruckParams> {
   final TyresRepo tyresRepo;
 
   InstallTyreToATruckUseCase({required this.tyresRepo});
 
   @override
-  Future<Either<Failure, NoParams>> call(
-      InstalltyretoatruckParams params) async {
+  Future<Either<Failure, String>> call(InstalltyretoatruckParams params) async {
     if (params.tyre.serial?.isEmpty ?? true) {
       return Left(Failure_HttpBadRequest(message: "Serial cannot be empty"));
     }
 
-    return await tyresRepo
-        .installTyreToATruck(params.tyre, params.newTyre)
-        .then((value) {
+    return await tyresRepo.installTyreToATruck(params.tyre, params.newTyre).then((value) {
       return value.fold(
         (l) => Left(l..message = "Install Tyre To A Truck: ${l.message}"),
         (r) => Right(r),

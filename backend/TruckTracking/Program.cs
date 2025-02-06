@@ -222,7 +222,7 @@ app.MapPut("/updateTruck", async ([FromServices] AppDbContext dbContext, [FromBo
     var found = await dbContext.Trucks.FirstOrDefaultAsync(x => x.PlatNo!.ToLower() == truck.PlatNo!.ToLower());
     if (found == null)
         return Results.BadRequest("Truck Not Found!");
-    if(truck.CurrentMileage< found.CurrentMileage)
+    if (truck.CurrentMileage < found.CurrentMileage)
         return Results.BadRequest("Invalid Mileage");
     found.CurrentMileage = truck.CurrentMileage;
     found.LastUpdatedMileageDate = DateTime.UtcNow;
@@ -234,11 +234,24 @@ app.MapPut("/updateTruck", async ([FromServices] AppDbContext dbContext, [FromBo
 
 app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromBody] Tyre tyre, [FromQuery] bool newTyre) =>
 {
-    
-    var tyreInDb =newTyre? null : await dbContext.Tyres.FirstOrDefaultAsync(x => x.Serial.ToLower().Trim().Replace(" ", "") == tyre.Serial.ToLower().Trim().Replace(" ", ""));
+
+    var tyreInDb = await dbContext.Tyres.FirstOrDefaultAsync(x => x.Serial.ToLower().Trim().Replace(" ", "") == tyre.Serial.ToLower().Trim().Replace(" ", ""));
+    bool returnSerial = false;
+    if (tyreInDb != null && newTyre)
+    {
+        var result = await dbContext.Database.SqlQuery<int>($"SELECT nextval('unique_number_seq') AS \"Value\"")
+        .FirstAsync();
+        tyreInDb = null;
+        tyre.Serial = tyre.Serial + " - " + result.ToString();
+        returnSerial = true;
+    }
+
+
     var truck = await dbContext.Trucks.Include(x => x.Tyres).FirstOrDefaultAsync(x => x.Id == tyre.TruckId);
     if (tyreInDb == null)
     {
+        if (tyre.Model.IsNullOrEmpty() || tyre.Serial.IsNullOrEmpty())
+            return Results.BadRequest("Model and serial should be filled!");
         tyreInDb = new Tyre
         {
             Model = tyre.Model,
@@ -272,15 +285,17 @@ app.MapPost("/installTyre", async ([FromServices] AppDbContext dbContext, [FromB
             Mileage = 0,
         });
         dbContext.SaveChanges();
-
-        return Results.Ok();
+        if (returnSerial)
+            return Results.Ok(tyreInDb.Serial);
+        else
+            return Results.Ok();
     }
     else
     {
         if (tyreInDb.TruckId != null)
         {
             var truckPlatNo = await dbContext.Trucks.FirstAsync(x => x.Id == tyreInDb.TruckId);
-            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No {truckPlatNo.PlatNo} "+ (tyreInDb.Position?.Side.ToString() ?? "") +(tyreInDb?.Position?.Index.ToString() ?? "") +(tyreInDb?.Position?.Direction.ToString() ?? ""));
+            return Results.BadRequest($"Tyre is already installed to another vehicle Plat No {truckPlatNo.PlatNo} " + (tyreInDb.Position?.Side.ToString() ?? "") + (tyreInDb?.Position?.Index.ToString() ?? "") + (tyreInDb?.Position?.Direction.ToString() ?? ""));
         }
         if (truck.Tyres.Any(x =>
             x.Position.Side == tyre.Position.Side &&
@@ -347,12 +362,12 @@ app.MapPut("/transfereTyreOnSameTruck", async ([FromServices] AppDbContext dbCon
     var tyre = await dbContext.Tyres.FirstOrDefaultAsync(x => x.Id == tyreId);
     if (tyre == null)
         return Results.BadRequest("Tyre not found!");
-    else if(tyre.TruckId ==null)
+    else if (tyre.TruckId == null)
         return Results.BadRequest("Tyre is not installed!");
-    var truck = await dbContext.Trucks.Include(x=>x.Tyres).FirstOrDefaultAsync(x => x.Id == tyre.TruckId);
+    var truck = await dbContext.Trucks.Include(x => x.Tyres).FirstOrDefaultAsync(x => x.Id == tyre.TruckId);
     if (truck == null)
         return Results.BadRequest("Truck not found!");
-    if(truck.Tyres.Any(x=>x.Position.Side == newPosition.Side && x.Position.Index == newPosition.Index && x.Position.Direction == newPosition.Direction))
+    if (truck.Tyres.Any(x => x.Position.Side == newPosition.Side && x.Position.Index == newPosition.Index && x.Position.Direction == newPosition.Direction))
         return Results.BadRequest("Another Tyre is installed in this position!");
     tyre.Position = newPosition;
     dbContext.Update(tyre);
@@ -366,15 +381,15 @@ app.MapPut("/transfereTyreOnSameTruck", async ([FromServices] AppDbContext dbCon
 
 app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQuery] string serial) =>
 {
-    serial = serial.ToLower().Trim().Replace(" ","");
-    var tyres = await dbContext.Tyres.Include(x=>x.Position).Where(x => x.Serial.ToLower().Trim().Replace(" ", "").StartsWith(serial)).ToListAsync();
+    serial = serial.ToLower().Trim().Replace(" ", "");
+    var tyres = await dbContext.Tyres.Include(x => x.Position).Where(x => x.Serial.ToLower().Trim().Replace(" ", "").StartsWith(serial)).ToListAsync();
 
     foreach (var tyre in tyres)
     {
         var historyMileage = dbContext.TyreLogs.Where(x => x.TyreId == tyre.Id).Sum(x => x.Mileage);
         tyre.TotalMileage = historyMileage + ((tyre.EndMileage ?? 0) - (tyre.StartMileage ?? 0));
         var truck = dbContext.Trucks.FirstOrDefault(x => x.Id == tyre.TruckId);
-        tyre.CurrentTruckPlateNo = truck ==null? "Not Installed!" : truck?.PlatNo + " "+ (tyre.Position?.Side.ToString() ?? "") +(tyre?.Position?.Index.ToString() ?? "") +(tyre?.Position?.Direction.ToString() ?? "");
+        tyre.CurrentTruckPlateNo = truck == null ? "Not Installed!" : truck?.PlatNo + " " + (tyre.Position?.Side.ToString() ?? "") + (tyre?.Position?.Index.ToString() ?? "") + (tyre?.Position?.Direction.ToString() ?? "");
     }
     return Results.Ok(tyres);
 
@@ -384,25 +399,40 @@ app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQue
 app.MapGet("/getNewId", async ([FromServices] AppDbContext dbContext) =>
 {
     int nextId = (dbContext.Tyres.Max(t => (int?)t.Id) ?? 0) + 1;
-    
+
     return Results.Ok(nextId);
 
 
 });
 app.MapPut("/addTyre", async ([FromServices] AppDbContext dbContext, [FromQuery] string serial, [FromQuery] string model) =>
 {
+    if (model.IsNullOrEmpty() || serial.IsNullOrEmpty())
+        return Results.BadRequest("Model and serial should be filled!");
+    var foundTyre = await dbContext.Tyres.FirstOrDefaultAsync(x => x.Serial.ToLower().Trim().Replace(" ", "") == serial.ToLower().Trim().Replace(" ", ""));
+    bool returnSerial = false;
+    if (foundTyre != null)
+    {
+        var result = await dbContext.Database.SqlQuery<int>($"SELECT nextval('unique_number_seq') AS \"Value\"")
+        .FirstAsync();
+
+        serial = serial + " - " + result.ToString();
+        returnSerial = true;
+    }
+
+
+
     var tyre = new Tyre
     {
         Model = model,
         Serial = serial,
         StartMileage = 0,
-        EndMileage =  0,
+        EndMileage = 0,
         AddedDate = DateTime.UtcNow,
         Position = null,
         TruckId = null,
         CurrentTruckPlateNo = null,
         InstalledDate = null,
-        TotalMileage = 0,        
+        TotalMileage = 0,
     };
     dbContext.Tyres.Add(tyre);
     dbContext.SaveChanges();
@@ -416,7 +446,10 @@ app.MapPut("/addTyre", async ([FromServices] AppDbContext dbContext, [FromQuery]
 
     });
     dbContext.SaveChanges();
-    return Results.Ok();
+    if (returnSerial)
+        return Results.Ok(tyre.Serial);
+    else
+        return Results.Ok();
 
 });
 
