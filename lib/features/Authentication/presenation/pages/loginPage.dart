@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tyres_frontend/core/Widgets/CustomTextFormField.dart';
+import 'package:tyres_frontend/core/Widgets/HomePagesParent.dart';
 import 'package:tyres_frontend/core/Widgets/MainText.dart';
 import 'package:tyres_frontend/core/Widgets/PrimaryButton.dart';
 import 'package:tyres_frontend/core/Widgets/SecondaryButton.dart';
@@ -10,7 +12,9 @@ import 'package:tyres_frontend/core/service_injector.dart';
 import 'package:tyres_frontend/features/Authentication/data/models/loginModel.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_bloc.dart';
 import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocEvents.dart';
-import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocStates.dart'; // For accessing GetIt instance
+import 'package:tyres_frontend/features/Authentication/presenation/blocs/authentication_blocStates.dart';
+import 'package:tyres_frontend/features/Authentication/presenation/pages/registerPage.dart';
+import 'package:tyres_frontend/features/Trucks/presenation/pages/TruckSearchPage.dart'; // For accessing GetIt instance
 
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -20,7 +24,14 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Access the AuthenticationBloc from GetIt
     final authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
-
+    Future.value(si<SharedPreferences>().get("token")).then((value) => {
+          if (value != "" && value != null)
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Homepagesparent(),
+                ))
+        });
     return Scaffold(
       appBar: AppBar(
         title: TitleText(title: 'Login'), // Using TitleText widget
@@ -57,7 +68,11 @@ class LoginPage extends StatelessWidget {
               listener: (context, state) {
                 if (state is AuthenticationLoginSuccessState) {
                   // Navigate to another page on successful login
-                  context.go('/trucks');
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Homepagesparent(),
+                      ));
                 } else if (state is AuthenticationErrorState) {
                   // Show error message if login failed
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -99,7 +114,11 @@ class LoginPage extends StatelessWidget {
             SecondaryButton(
               text: 'Don’t have an account? Register here',
               onPressed: () {
-                context.go('/register');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RegisterPage(),
+                    ));
               },
             ),
           ],

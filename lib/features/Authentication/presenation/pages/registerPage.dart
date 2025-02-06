@@ -76,7 +76,7 @@ class RegisterPage extends StatelessWidget {
               listener: (context, state) {
                 if (state is AuthenticationRegisterSuccessState) {
                   // Navigate to login page after successful registration
-                  context.go('/login');
+                  Navigator.pop(context);
                 } else if (state is AuthenticationErrorState) {
                   // Show error message if registration failed
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -130,7 +130,7 @@ class RegisterPage extends StatelessWidget {
             SecondaryButton(
               text: 'Already have an account? Login here',
               onPressed: () {
-                context.go('/login');
+                Navigator.pop(context);
               },
             ),
           ],
