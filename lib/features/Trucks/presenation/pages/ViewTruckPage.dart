@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:tyres_frontend/core/Widgets/CustomTextFormField.dart';
+import 'package:tyres_frontend/core/Widgets/LogoutButton.dart';
 import 'package:tyres_frontend/core/Widgets/TitleText.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_bloc.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_blocEvents.dart';
@@ -73,6 +74,7 @@ class ViewTruckPage extends StatelessWidget {
             'Truck Details',
             style: TextStyle(fontSize: 18.sp), // Responsive text size
           ),
+          actions: [LogoutButton()],
         ),
         body: Padding(
           padding: EdgeInsets.all(16.w), // Responsive padding

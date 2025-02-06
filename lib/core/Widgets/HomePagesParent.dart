@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:tyres_frontend/core/Widgets/LogoutButton.dart';
 import 'package:tyres_frontend/core/Widgets/globalAuthBloc.dart';
 import 'package:tyres_frontend/core/remoteConstats.dart';
 import 'package:tyres_frontend/core/service_Injector.dart';
@@ -44,8 +45,12 @@ class _HomepagesparentState extends State<Homepagesparent> {
       appBar: AppBar(
         title: Text(
           navBarIndex == 0 ? "Search Trucks" : "Search Tyres",
-          style: TextStyle(fontSize: 18.sp), // Responsive text size for app bar title
+          style: TextStyle(
+              fontSize: 18.sp), // Responsive text size for app bar title
         ),
+        actions: [
+          LogoutButton(),
+        ],
       ),
       body: BlocListener<Globalauthbloc, AuthenticationState>(
         bloc: globalauthbloc,
@@ -102,7 +107,9 @@ class _HomepagesparentState extends State<Homepagesparent> {
               builder: (BuildContext context) {
                 return Padding(
                   padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard
+                    bottom: MediaQuery.of(context)
+                        .viewInsets
+                        .bottom, // Adjust for keyboard
                     top: 16.h,
                     left: 16.w,
                     right: 16.w,
@@ -121,7 +128,9 @@ class _HomepagesparentState extends State<Homepagesparent> {
               builder: (BuildContext context) {
                 return Padding(
                   padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust for keyboard
+                    bottom: MediaQuery.of(context)
+                        .viewInsets
+                        .bottom, // Adjust for keyboard
                     top: 16.h,
                     left: 16.w,
                     right: 16.w,
