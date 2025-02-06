@@ -90,3 +90,8 @@ class GetTyreBySerialEvent extends TyreEvent {
   @override
   List<Object?> get props => [serial];
 }
+
+class GetNextTyreIdEvent extends TyreEvent {
+  @override
+  List<Object?> get props => [];
+}

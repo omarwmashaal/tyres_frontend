@@ -8,6 +8,7 @@ import 'package:tyres_frontend/features/Tyres/data/models/tyrePositionModel.dart
 import 'package:tyres_frontend/features/Tyres/domain/entities/tyreEnums.dart';
 
 abstract class TyreDatasource {
+  Future<int> getNextId();
   Future<TyreModel> getTyreData(int id);
   Future<List<TyreModel>> getTyresForATruck(int truckId);
   Future<NoParams> installTyreToATruck(TyreModel tyre);
@@ -15,7 +16,8 @@ abstract class TyreDatasource {
   Future<NoParams> addTyre(TyreModel tyre);
   Future<NoParams> deleteTyre(int id);
   Future<List<TyreModel>> getTyreBySerial(String serial);
-  Future<NoParams> changeTyrePosition(int truckId, TyrePositionModel newPosition);
+  Future<NoParams> changeTyrePosition(
+      int truckId, TyrePositionModel newPosition);
 }
 
 class TyreDatasourceImpl implements TyreDatasource {
@@ -24,7 +26,8 @@ class TyreDatasourceImpl implements TyreDatasource {
   TyreDatasourceImpl({required this.httpRepo});
   @override
   Future<NoParams> addTyre(TyreModel tyre) async {
-    var result = await httpRepo.put(host: "addTyre?serial=${tyre.serial}&model=${tyre.model}");
+    var result = await httpRepo.put(
+        host: "addTyre?serial=${tyre.serial}&model=${tyre.model}");
     if (result.statusCode == 200) {
       return NoParams();
     } else
@@ -37,7 +40,8 @@ class TyreDatasourceImpl implements TyreDatasource {
   }
 
   @override
-  Future<NoParams> changeTyrePosition(int truckId, TyrePositionModel newPosition) async {
+  Future<NoParams> changeTyrePosition(
+      int truckId, TyrePositionModel newPosition) async {
     // Mock implementation for changing tyre position
     return Future.value(NoParams());
   }
@@ -52,7 +56,9 @@ class TyreDatasourceImpl implements TyreDatasource {
   Future<List<TyreModel>> getTyreBySerial(String serial) async {
     var result = await httpRepo.get(host: "searchTyre?serial=$serial");
     if (result.statusCode == 200) {
-      return (json.decode(result.data as String) as List<dynamic>).map((e) => TyreModel.fromJson(e as Map<String, dynamic>)).toList();
+      return (json.decode(result.data as String) as List<dynamic>)
+          .map((e) => TyreModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } else
       throw FailureException(
         failure: FailureFactory.createFailure(
@@ -132,6 +138,20 @@ class TyreDatasourceImpl implements TyreDatasource {
     var result = await httpRepo.put(host: "removeTyreFromTruck?tyreId=$tyreId");
     if (result.statusCode == 200) {
       return NoParams();
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
+  }
+
+  @override
+  Future<int> getNextId() async {
+    var result = await httpRepo.get(host: "getNewId");
+    if (result.statusCode == 200) {
+      return int.parse((result.data ?? "0") as String);
     } else
       throw FailureException(
         failure: FailureFactory.createFailure(

@@ -5,6 +5,7 @@ import 'package:tyres_frontend/features/Tyres/domain/entities/tyreEntity.dart';
 import 'package:tyres_frontend/features/Tyres/domain/entities/tyrePositionEntity.dart';
 
 abstract class TyresRepo {
+  Future<Either<Failure, int>> getNextId();
   Future<Either<Failure, TyreEntity>> getTyreData(int id);
   Future<Either<Failure, List<TyreEntity>>> getTyresForATruck(int truckId);
   Future<Either<Failure, NoParams>> installTyreToATruck(TyreEntity tyre);
@@ -12,5 +13,6 @@ abstract class TyresRepo {
   Future<Either<Failure, NoParams>> addTyre(TyreEntity tyre);
   Future<Either<Failure, NoParams>> deleteTyre(int id);
   Future<Either<Failure, List<TyreEntity>>> getTyreBySerial(String serial);
-  Future<Either<Failure, NoParams>> changeTyrePosition(int truckId, TyrePositionEntity newPosition);
+  Future<Either<Failure, NoParams>> changeTyrePosition(
+      int truckId, TyrePositionEntity newPosition);
 }

@@ -24,6 +24,7 @@ import 'package:tyres_frontend/features/Tyres/domain/repo/tyresRepo.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/AddTyreUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/ChangeTyrePositionUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/DeleteTyreUseCase.dart';
+import 'package:tyres_frontend/features/Tyres/domain/usecases/GetNextIdUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/GetTyreBySerialUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/InstallTyreToATruckUseCase.dart';
 import 'package:tyres_frontend/features/Tyres/domain/usecases/RemoveTyreFromATruckUseCase.dart';
@@ -35,17 +36,20 @@ var si = GetIt.instance;
 
 setUpServiceInjectors() async {
   //?core
-  si.registerSingletonAsync<SharedPreferences>(() async => await SharedPreferences.getInstance());
+  si.registerSingletonAsync<SharedPreferences>(
+      () async => await SharedPreferences.getInstance());
   await si.allReady();
   si.registerLazySingleton(() => Globalauthbloc());
   si.registerLazySingleton<HttpRepo>(() => HttpClientImpl(
         sharedPreferences: si(),
         authenticationBloc: si(),
       ));
-  si.registerLazySingleton<Sharedpreferencesdatasource>(() => SharedPreferencesDatasourceImpl(sharedPreferences: si()));
+  si.registerLazySingleton<Sharedpreferencesdatasource>(
+      () => SharedPreferencesDatasourceImpl(sharedPreferences: si()));
   //?Authentication
   //datsources
-  si.registerLazySingleton<AuthenticationDatasource>(() => AuthenticationDatasourceImpl(httpRepo: si()));
+  si.registerLazySingleton<AuthenticationDatasource>(
+      () => AuthenticationDatasourceImpl(httpRepo: si()));
   //repo
   si.registerLazySingleton<Authenticationrepo>(() => Authenticationrepoimpl(
         authenticationDatasource: si(),
@@ -61,9 +65,11 @@ setUpServiceInjectors() async {
       ));
   //?Trucks
   //datsources
-  si.registerLazySingleton<Truckdatasource>(() => TruckDatasourceImpl(httpRepo: si()));
+  si.registerLazySingleton<Truckdatasource>(
+      () => TruckDatasourceImpl(httpRepo: si()));
   //repo
-  si.registerLazySingleton<Truckrepo>(() => Truckrepoimpl(truckdatasource: si()));
+  si.registerLazySingleton<Truckrepo>(
+      () => Truckrepoimpl(truckdatasource: si()));
   //usecases
   si.registerLazySingleton(() => RemoveTruckUseCase(truckrepo: si()));
   si.registerLazySingleton(() => SearchTrucksUseCase(truckrepo: si()));
@@ -81,9 +87,11 @@ setUpServiceInjectors() async {
 
   //?Tyres
   //datsources
-  si.registerLazySingleton<TyreDatasource>(() => TyreDatasourceImpl(httpRepo: si()));
+  si.registerLazySingleton<TyreDatasource>(
+      () => TyreDatasourceImpl(httpRepo: si()));
   //repo
-  si.registerLazySingleton<TyresRepo>(() => TyresRepoImpl(tyreDatasource: si()));
+  si.registerLazySingleton<TyresRepo>(
+      () => TyresRepoImpl(tyreDatasource: si()));
   //usecases
   si.registerLazySingleton(() => AddTyreUseCase(tyresRepo: si()));
   si.registerLazySingleton(() => ChangeTyrePositionUseCase(tyresRepo: si()));
@@ -93,6 +101,7 @@ setUpServiceInjectors() async {
   si.registerLazySingleton(() => GetTyresForATruckUseCase(tyresRepo: si()));
   si.registerLazySingleton(() => InstallTyreToATruckUseCase(tyresRepo: si()));
   si.registerLazySingleton(() => RemoveTyreFromATruckUseCase(tyresRepo: si()));
+  si.registerLazySingleton(() => GetNextTyreIdUseCase(tyresRepo: si()));
   //?blocs
   si.registerLazySingleton(() => TyreBloc(
         addTyreUseCase: si(),
@@ -103,5 +112,6 @@ setUpServiceInjectors() async {
         installTyreToATruckUseCase: si(),
         removeTyreFromATruckUseCase: si(),
         getTyreDataUseCase: si(),
+        getNextTyreIdUseCase: si(),
       ));
 }

@@ -29,6 +29,7 @@ class TyreLoadedState extends TyreState {
   @override
   List<Object?> get props => [tyre];
 }
+
 // State when a tyres are successfully fetched
 class TyresLoadedState extends TyreState {
   final List<TyreEntity> tyres;
@@ -70,6 +71,29 @@ class TyreErrorState extends TyreState {
   final String message;
 
   TyreErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class LoadingNextTyreIdState extends TyreState {
+  @override
+  List<Object?> get props => [];
+}
+
+class LoadedNextTyreIdState extends TyreState {
+  final int nextId;
+
+  LoadedNextTyreIdState({required this.nextId});
+
+  @override
+  List<Object?> get props => [nextId];
+}
+
+class LoadingNextTyreIdErrorState extends TyreState {
+  final String message;
+
+  LoadingNextTyreIdErrorState({required this.message});
 
   @override
   List<Object?> get props => [message];

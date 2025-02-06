@@ -11,6 +11,12 @@ class AddTyreUseCase extends UseCase<NoParams, TyreEntity> {
 
   @override
   Future<Either<Failure, NoParams>> call(TyreEntity tyre) async {
+    if (tyre.serial?.isEmpty ?? true) {
+      return Left(Failure_HttpBadRequest(message: "Serial cannot be empty"));
+    }
+    if (tyre.model?.isEmpty ?? true) {
+      return Left(Failure_HttpBadRequest(message: "Model cannot be empty"));
+    }
     return await tyresRepo.addTyre(tyre).then((value) {
       return value.fold(
         (l) => Left(l..message = "Add Tyre: ${l.message}"),
