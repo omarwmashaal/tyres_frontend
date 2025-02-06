@@ -17,7 +17,7 @@ abstract class TyreDatasource {
   Future<NoParams> deleteTyre(int id);
   Future<List<TyreModel>> getTyreBySerial(String serial);
   Future<NoParams> changeTyrePosition(
-      int truckId, TyrePositionModel newPosition);
+      int tyreId, TyrePositionModel newPosition);
 }
 
 class TyreDatasourceImpl implements TyreDatasource {
@@ -41,9 +41,19 @@ class TyreDatasourceImpl implements TyreDatasource {
 
   @override
   Future<NoParams> changeTyrePosition(
-      int truckId, TyrePositionModel newPosition) async {
-    // Mock implementation for changing tyre position
-    return Future.value(NoParams());
+      int tyreId, TyrePositionModel newPosition) async {
+    var result = await httpRepo.put(
+        host: "transfereTyreOnSameTruck?tyreId=$tyreId",
+        body: newPosition.toJson());
+    if (result.statusCode == 200) {
+      return NoParams();
+    } else
+      throw FailureException(
+        failure: FailureFactory.createFailure(
+          result.statusCode,
+          result.errorMessage ?? "Unknown Error",
+        ),
+      );
   }
 
   @override

@@ -222,6 +222,8 @@ app.MapPut("/updateTruck", async ([FromServices] AppDbContext dbContext, [FromBo
     var found = await dbContext.Trucks.FirstOrDefaultAsync(x => x.PlatNo!.ToLower() == truck.PlatNo!.ToLower());
     if (found == null)
         return Results.BadRequest("Truck Not Found!");
+    if(truck.CurrentMileage< found.CurrentMileage)
+        return Results.BadRequest("Invalid Mileage");
     found.CurrentMileage = truck.CurrentMileage;
     found.LastUpdatedMileageDate = DateTime.UtcNow;
     dbContext.Trucks.Update(found);
@@ -334,6 +336,26 @@ app.MapPut("/removeTyreFromTruck", async ([FromServices] AppDbContext dbContext,
         Mileage = (tyre.EndMileage ?? 0) - (tyre.StartMileage ?? 0),
     });
     dbContext.Tyres.Update(tyre);
+    dbContext.SaveChanges();
+    return Results.Ok();
+
+
+
+});
+app.MapPut("/transfereTyreOnSameTruck", async ([FromServices] AppDbContext dbContext, [FromQuery] int tyreId, [FromBody] TyrePosition newPosition) =>
+{
+    var tyre = await dbContext.Tyres.FirstOrDefaultAsync(x => x.Id == tyreId);
+    if (tyre == null)
+        return Results.BadRequest("Tyre not found!");
+    else if(tyre.TruckId ==null)
+        return Results.BadRequest("Tyre is not installed!");
+    var truck = await dbContext.Trucks.Include(x=>x.Tyres).FirstOrDefaultAsync(x => x.Id == tyre.TruckId);
+    if (truck == null)
+        return Results.BadRequest("Truck not found!");
+    if(truck.Tyres.Any(x=>x.Position.Side == newPosition.Side && x.Position.Index == newPosition.Index && x.Position.Direction == newPosition.Direction))
+        return Results.BadRequest("Another Tyre is installed in this position!");
+    tyre.Position = newPosition;
+    dbContext.Update(tyre);
     dbContext.SaveChanges();
     return Results.Ok();
 

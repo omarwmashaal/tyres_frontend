@@ -29,7 +29,8 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
   }) : super(TruckInitialState()) {
     on<AddTruckEvent>((event, emit) async {
       emit(TruckLoadingState());
-      final Either<Failure, TruckEntity> result = await addTruckUseCase(event.truck);
+      final Either<Failure, TruckEntity> result =
+          await addTruckUseCase(event.truck);
       result.fold(
         (failure) => emit(TruckErrorState(message: failure.message)),
         (truck) => emit(TruckAddedState(truck: truck)),
@@ -38,7 +39,8 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
 
     on<GetTruckEvent>((event, emit) async {
       emit(TruckLoadingState());
-      final Either<Failure, TruckEntity> result = await getTruckUseCase(event.truckId);
+      final Either<Failure, TruckEntity> result =
+          await getTruckUseCase(event.truckId);
       result.fold(
         (failure) => emit(TruckErrorState(message: failure.message)),
         (truck) => emit(TruckLoadedState(truck: truck)),
@@ -47,7 +49,8 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
 
     on<RemoveTruckEvent>((event, emit) async {
       emit(TruckLoadingState());
-      final Either<Failure, NoParams> result = await removeTruckUseCase(event.truckId);
+      final Either<Failure, NoParams> result =
+          await removeTruckUseCase(event.truckId);
       result.fold(
         (failure) => emit(TruckErrorState(message: failure.message)),
         (_) => emit(TruckRemovedState(truckId: event.truckId)),
@@ -56,7 +59,8 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
 
     on<SearchTrucksEvent>((event, emit) async {
       emit(TruckLoadingState());
-      final Either<Failure, List<TruckEntity>> result = await searchTrucksUseCase(event.searchTerm);
+      final Either<Failure, List<TruckEntity>> result =
+          await searchTrucksUseCase(event.searchTerm);
       result.fold(
         (failure) => emit(TruckErrorState(message: failure.message)),
         (trucks) => emit(TrucksSearchedState(trucks: trucks)),
@@ -65,9 +69,10 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
 
     on<UpdateTruckEvent>((event, emit) async {
       emit(TruckLoadingState());
-      final Either<Failure, TruckEntity> result = await updateTruckUseCase(event.updatedTruck);
+      final Either<Failure, TruckEntity> result =
+          await updateTruckUseCase(event.updatedTruck);
       result.fold(
-        (failure) => emit(TruckErrorState(message: failure.message)),
+        (failure) => emit(TruckUpdateErrorState(message: failure.message)),
         (truck) => emit(TruckUpdatedState(truck: truck)),
       );
     });

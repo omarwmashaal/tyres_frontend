@@ -73,3 +73,13 @@ class TruckErrorState extends TruckState {
   @override
   List<Object?> get props => [message];
 }
+
+// State when an error occurs
+class TruckUpdateErrorState extends TruckState {
+  final String message;
+
+  TruckUpdateErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
