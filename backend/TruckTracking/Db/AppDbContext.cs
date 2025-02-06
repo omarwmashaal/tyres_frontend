@@ -18,6 +18,14 @@ namespace TruckTracking.Db
                 .HasOne<Truck>()
                 .WithMany(t => t.Tyres)
                 .HasForeignKey(t => t.TruckId);
+
+            modelBuilder.Entity<Tyre>()
+               .OwnsOne(t => t.Position, p =>
+               {
+                   p.Property(tp => tp.Direction).HasColumnName("Position_Direction").IsRequired(false);
+                   p.Property(tp => tp.Side).HasColumnName("Position_Side").IsRequired(false);
+                   p.Property(tp => tp.Index).HasColumnName("Position_Index").IsRequired(false);
+               });
         }
 
     }

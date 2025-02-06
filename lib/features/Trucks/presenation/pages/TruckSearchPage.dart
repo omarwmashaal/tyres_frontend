@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 import 'package:tyres_frontend/core/Widgets/CustomTextFormField.dart';
 import 'package:tyres_frontend/features/Trucks/domain/entities/truckEntity.dart';
@@ -25,7 +26,18 @@ class TruckSearchPage extends StatelessWidget {
 
     return BlocListener<TruckBloc, TruckState>(
       listener: (context, state) {
-        if (state is TruckAddedState) truckBloc.add(SearchTrucksEvent(searchTerm: ""));
+        if (state is TruckLoadingState) {
+          context.loaderOverlay.show();
+        } else {
+          context.loaderOverlay.hide();
+        }
+        if (state is TruckAddedState)
+          truckBloc.add(SearchTrucksEvent(searchTerm: ""));
+        else if (state is TruckErrorState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
       },
       child: Padding(
         padding: EdgeInsets.all(16.w), // Responsive padding
@@ -45,10 +57,10 @@ class TruckSearchPage extends StatelessWidget {
             // Display truck list based on the current bloc state
             Expanded(
               child: BlocBuilder<TruckBloc, TruckState>(
+                buildWhen: (previous, current) =>
+                    current is TrucksSearchedState,
                 builder: (context, state) {
-                  if (state is TruckLoadingState) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (state is TrucksSearchedState) {
+                  if (state is TrucksSearchedState) {
                     if (state.trucks.isEmpty) {
                       return Center(
                         child: Text(
@@ -64,34 +76,34 @@ class TruckSearchPage extends StatelessWidget {
                         final TruckEntity truck = state.trucks[index];
 
                         return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h), // Responsive vertical padding between list items
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8
+                                  .h), // Responsive vertical padding between list items
                           child: ListTile(
                             title: Text(
                               'Plate No: ${truck.platNo ?? "N/A"}',
-                              style: TextStyle(fontSize: 16.sp), // Responsive text size for plate number
+                              style: TextStyle(
+                                  fontSize: 16
+                                      .sp), // Responsive text size for plate number
                             ),
                             subtitle: Text(
                               'Mileage: ${truck.currentMileage ?? 0} km',
-                              style: TextStyle(fontSize: 14.sp), // Responsive text size for mileage
+                              style: TextStyle(
+                                  fontSize: 14
+                                      .sp), // Responsive text size for mileage
                             ),
                             onTap: () {
                               // Navigate to truck details or edit page
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ViewTruckPage(truckId: truck.id ?? 0),
+                                    builder: (context) =>
+                                        ViewTruckPage(truckId: truck.id ?? 0),
                                   ));
                             },
                           ),
                         );
                       },
-                    );
-                  } else if (state is TruckErrorState) {
-                    return Center(
-                      child: Text(
-                        'Error: ${state.message}',
-                        style: TextStyle(fontSize: 16.sp), // Responsive text size for error message
-                      ),
                     );
                   }
 
@@ -99,7 +111,9 @@ class TruckSearchPage extends StatelessWidget {
                   return Center(
                     child: Text(
                       'Start searching for trucks.',
-                      style: TextStyle(fontSize: 16.sp), // Responsive text size for default message
+                      style: TextStyle(
+                          fontSize: 16
+                              .sp), // Responsive text size for default message
                     ),
                   );
                 },

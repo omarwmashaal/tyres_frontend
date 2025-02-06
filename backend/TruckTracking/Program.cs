@@ -320,7 +320,8 @@ app.MapPut("/removeTyreFromTruck", async ([FromServices] AppDbContext dbContext,
     }
     var truck = await dbContext.Trucks.FirstAsync(x => x.Id == tyre.TruckId);
     tyre.TruckId = null;
-    tyre.EndMileage = truck.CurrentMileage ?? 0;
+    tyre.EndMileage = 0;
+    tyre.StartMileage = 0;
     dbContext.TyreLogs.Add(new TyreLog
     {
         Date = DateTime.UtcNow,
@@ -350,7 +351,7 @@ app.MapGet("/searchTyre", async ([FromServices] AppDbContext dbContext, [FromQue
         var historyMileage = dbContext.TyreLogs.Where(x => x.TyreId == tyre.Id).Sum(x => x.Mileage);
         tyre.TotalMileage = historyMileage + ((tyre.EndMileage ?? 0) - (tyre.StartMileage ?? 0));
         var truck = dbContext.Trucks.FirstOrDefault(x => x.Id == tyre.TruckId);
-        tyre.CurrentTruckPlateNo = truck?.PlatNo + " "+ (tyre.Position?.Side.ToString() ?? "") +(tyre?.Position?.Index.ToString() ?? "") +(tyre?.Position?.Direction.ToString() ?? "");
+        tyre.CurrentTruckPlateNo = truck ==null? "Not Installed!" : truck?.PlatNo + " "+ (tyre.Position?.Side.ToString() ?? "") +(tyre?.Position?.Index.ToString() ?? "") +(tyre?.Position?.Direction.ToString() ?? "");
     }
     return Results.Ok(tyres);
 

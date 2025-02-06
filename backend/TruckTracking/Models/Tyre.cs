@@ -14,7 +14,7 @@ namespace TruckTracking.Models
         public int? EndMileage { get; set; } = 0;
         public String? Serial { get; set; }
         public String? Model { get; set; }
-        public TyrePosition? Position { get; set; } = new TyrePosition();
+        public TyrePosition? Position { get; set; } = null;
         public DateTime? AddedDate { get; set; }
         public DateTime? InstalledDate { get; set; }
         [NotMapped]
@@ -25,8 +25,9 @@ namespace TruckTracking.Models
     [Owned]
     public class TyrePosition
     {
-        public Enum_TyreDirection Direction { get; set; }
-        public Enum_TyreSide Side { get; set; }
-        public int Index { get; set; }
+      
+        public Enum_TyreDirection? Direction { get; set; }
+        public Enum_TyreSide? Side { get; set; }
+        public int? Index { get; set; }
     }
 }

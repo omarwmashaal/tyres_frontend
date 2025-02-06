@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TruckTracking.Db;
@@ -11,9 +12,11 @@ using TruckTracking.Db;
 namespace TruckTracking.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250206161513_nullableTyrePosition")]
+    partial class nullableTyrePosition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,16 +184,13 @@ namespace TruckTracking.Migrations
                                 .HasColumnType("integer");
 
                             b1.Property<int?>("Direction")
-                                .HasColumnType("integer")
-                                .HasColumnName("Position_Direction");
+                                .HasColumnType("integer");
 
                             b1.Property<int?>("Index")
-                                .HasColumnType("integer")
-                                .HasColumnName("Position_Index");
+                                .HasColumnType("integer");
 
                             b1.Property<int?>("Side")
-                                .HasColumnType("integer")
-                                .HasColumnName("Position_Side");
+                                .HasColumnType("integer");
 
                             b1.HasKey("TyreId");
 

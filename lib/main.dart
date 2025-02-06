@@ -10,6 +10,7 @@ import 'package:tyres_frontend/features/Authentication/presenation/blocs/authent
 import 'package:tyres_frontend/features/Authentication/presenation/pages/loginPage.dart';
 import 'package:tyres_frontend/features/Trucks/presenation/blocs/truck_bloc.dart';
 import 'package:tyres_frontend/features/Tyres/presenation/blocs/tyres_bloc.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 import 'core/remoteConstats.dart'; // Your GetIt service injector setup
 
@@ -29,21 +30,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => si<AuthenticationBloc>()),
-        BlocProvider(create: (context) => si<TruckBloc>()),
-        BlocProvider(create: (context) => si<TyreBloc>()),
-        BlocProvider(create: (context) => si<Globalauthbloc>()),
-      ],
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        builder: (context, child) {
-          globalauthbloc = BlocProvider.of<Globalauthbloc>(context);
-          return MaterialApp(
-            home: LoginPage(),
-          );
-        },
+    return GlobalLoaderOverlay(
+      duration: Durations.medium4,
+      reverseDuration: Durations.medium4,
+      overlayColor: Colors.grey.withValues(alpha: 0.8),
+      overlayWidgetBuilder: (_) {
+        //ignored progress for the moment
+        return Center(child: CircularProgressIndicator());
+      },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => si<AuthenticationBloc>()),
+          BlocProvider(create: (context) => si<TruckBloc>()),
+          BlocProvider(create: (context) => si<TyreBloc>()),
+          BlocProvider(create: (context) => si<Globalauthbloc>()),
+        ],
+        child: ScreenUtilInit(
+          designSize: const Size(375, 812),
+          builder: (context, child) {
+            globalauthbloc = BlocProvider.of<Globalauthbloc>(context);
+            return MaterialApp(
+              home: LoginPage(),
+            );
+          },
+        ),
       ),
     );
   }
