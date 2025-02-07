@@ -19,8 +19,7 @@ import 'package:tyres_frontend/features/Trucks/presenation/pages/TruckSearchPage
 
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController hostController =
-      TextEditingController(text: remoteHost);
+  final TextEditingController hostController = TextEditingController(text: remoteHost);
   final TextEditingController passwordController = TextEditingController();
 
   @override
@@ -45,9 +44,7 @@ class LoginPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             // Main Text above the form
-            MainText(
-                text:
-                    'Enter your credentials to log in'), // Using MainText widget
+            MainText(text: 'Enter your credentials to log in'), // Using MainText widget
 
             SizedBox(height: 16),
 
@@ -69,13 +66,13 @@ class LoginPage extends StatelessWidget {
             SizedBox(height: 16),
 
             // Host Input Field
-            CustomTextFormField(
-              controller: hostController,
-              labelText: 'Host',
-              onChanged: (p0) => remoteHost = hostController.text,
-            ),
+            // CustomTextFormField(
+            //   controller: hostController,
+            //   labelText: 'Host',
+            //   onChanged: (p0) => remoteHost = hostController.text,
+            // ),
 
-            SizedBox(height: 16),
+            // SizedBox(height: 16),
 
             // Login Button
             BlocConsumer<AuthenticationBloc, AuthenticationState>(
@@ -109,14 +106,12 @@ class LoginPage extends StatelessWidget {
                     if (email.isNotEmpty && password.isNotEmpty) {
                       authenticationBloc.add(
                         LoginEvent(
-                          loginModel:
-                              Loginmodel(email: email, password: password),
+                          loginModel: Loginmodel(email: email, password: password),
                         ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text('Please enter email and password')),
+                        SnackBar(content: Text('Please enter email and password')),
                       );
                     }
                   },
