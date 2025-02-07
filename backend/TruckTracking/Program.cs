@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using System;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
@@ -79,6 +80,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Configure Authorization
 builder.Services.AddAuthorization();
 
+bool IsTransientError(Exception ex)
+{
+    return ex.InnerException.Message.ToLower().Contains("failed to connect to") ||
+     (ex.InnerException is NpgsqlException && ((NpgsqlException) ex.InnerException).IsTransient==true) ||
+      ex is HttpRequestException ||
+      ex is TimeoutException;
+}
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -102,6 +110,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
+
+
 app.Use(async (context, next) =>
 {
     var originalBodyStream = context.Response.Body;
@@ -111,25 +121,43 @@ app.Use(async (context, next) =>
 
     var response = new ApiResult();
 
-    try
+    int retryCount = 3;
+    int retryDelayMs = 2500;
+    while(retryCount>0)
     {
-        await next();
+        try
+        {
+            await next();
 
-        context.Response.Body.Seek(0, SeekOrigin.Begin);
-        var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
-        response.StatusCode = context.Response.StatusCode;
-        if (response.StatusCode != StatusCodes.Status200OK)
-            response.ErrorMessage = responseBody; // Capture the response body content
-        else
-            response.Data = responseBody; // Capture the response body content
-        response.isSuccess = true;
+            context.Response.Body.Seek(0, SeekOrigin.Begin);
+            var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
+            response.StatusCode = context.Response.StatusCode;
+            if (response.StatusCode != StatusCodes.Status200OK)
+                response.ErrorMessage = responseBody; // Capture the response body content
+            else
+                response.Data = responseBody; // Capture the response body content
+            response.isSuccess = true;
+            break;
+        }
+        catch (Exception e)
+        {
+  
+            if (IsTransientError(e) && retryCount > 1)
+            {
+                await Task.Delay(retryDelayMs);
+                retryDelayMs *= 2;
+                retryCount--;
+            }
+            else
+            {
+                response.isSuccess = false;
+                response.ErrorMessage = e.Message;
+                response.StatusCode = StatusCodes.Status500InternalServerError;
+                break;
+            }
+        }
     }
-    catch (Exception e)
-    {
-        response.isSuccess = false;
-        response.ErrorMessage = e.Message;
-        response.StatusCode = StatusCodes.Status500InternalServerError;
-    }
+    
 
 
     context.Response.Body.Seek(0, SeekOrigin.Begin);
@@ -141,8 +169,9 @@ app.Use(async (context, next) =>
     context.Response.Body = originalBodyStream;
 });
 
-app.MapGet("/test", () =>
+app.MapGet("/test", ([FromServices] AppDbContext dbContext) =>
 {
+    var tyres = dbContext.Tyres.FirstOrDefault();
     return Results.Ok("Connected");
 });
 
